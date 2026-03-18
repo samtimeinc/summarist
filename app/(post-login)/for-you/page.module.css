@@ -1,0 +1,136 @@
+.row {
+    max-width: 1070px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .container {
+    padding: 40px 0;
+    width: 100%;
+  }
+
+
+
+ /* Selected just for you   */
+ .forYou__wrapper h2 {
+    margin-bottom: 16px;
+ }
+
+ .forYou-subtitle {
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 300;
+    margin-bottom: 12px;
+ }
+
+.selected__book {
+    display: flex;
+    justify-content: space-between;
+    width: calc((100% / 3) * 2);
+    background-color: #fbefd6;
+    border-radius: 4px;
+    padding: 24px;
+    gap: 24px;
+    margin-bottom: 36px;
+}
+
+.selected__book--subtitle {
+    color: #032b41;
+    width: 40%;
+}
+
+.selected__divider {
+    display: flex;
+    justify-content: center;
+    margin: 0 16px;
+}
+
+.selected__divider::before,
+.selected__divider::after {
+    content: "";
+    display: block;
+    flex-grow: 1;
+    width: 1px;
+    background: #bac8ce;
+}
+
+.selected__book--content {
+    width: 60%;
+    gap: 16px;
+    display: flex;
+}
+
+.selected__book--img-wrapper {
+    height: 140px;
+    width: 140px;
+    min-width: 140px;
+}
+
+.selected__book--img-wrapper img {
+    height: 100%;
+    width: 100%;
+}
+
+.selected__book--info {
+    width: 100%;
+}
+
+.selected__book--title {
+    margin-bottom: 8px;
+}
+
+.selected__book--title, 
+.audio__controls--text {
+    font-weight: 600;
+    color: #032b41;
+}
+
+.selected__book--author {
+    font-weight: 300;
+    margin-bottom: 16px;
+}
+
+.selected__book--author,
+.audio__controls div {
+    font-size: 14px;
+    color: #032b41;
+}
+
+.audio__controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.audio__controls--icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+}
+
+.recommended__books {
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1230px) {
+    .selected__book {
+        width: 100%;
+    }
+}
+@media (max-width: 1025px) {
+    .selected__book {
+      flex-direction: column;
+    }
+    .selected__divider {
+        display: none;
+    }
+    .selected__book--subtitle {
+        width: 100%;
+    }
+  }
+@media (max-width: 580px) {
+    .selected__book--content {
+        width: 100%;
+    }
+}
