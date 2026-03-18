@@ -2,7 +2,7 @@
 
 import "../globals.css"
 import { useState } from "react";
-import { AuthModalProvider, useAuthModal } from "@/context/AuthModalContext";
+import { useAuthModal } from "@/context/AuthModalContext";
 import SideNavBar from '@/components/SideNavBar'
 import Search from '@/components/Search'
 import Login from "@/components/home-components/AuthModal"
@@ -33,10 +33,8 @@ export default function AuthenticatedLayout({
 }>) {
 
     return (
-        <AuthModalProvider>
-            <LayoutContent>
-                {children}
-            </LayoutContent>
-        </AuthModalProvider>
+        <LayoutContent>
+            {children}
+        </LayoutContent>
     )
 }

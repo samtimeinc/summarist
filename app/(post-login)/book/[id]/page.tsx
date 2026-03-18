@@ -13,6 +13,7 @@ import { RootState } from "@/lib/redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuthModal } from '@/context/AuthModalContext';
 import { saveBookToLibrary, removeBookFromLibrary } from "@/services/libraryService"
+import { addBook, removeBook } from "@/lib/redux/librarySlice"
 
 import { FaRegStar } from "react-icons/fa";
 import { FiClock } from "react-icons/fi";
@@ -20,7 +21,7 @@ import { IoMicOutline } from "react-icons/io5";
 import { HiOutlineLightBulb } from "react-icons/hi";
 import { LuBookText } from "react-icons/lu";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
-import { addBook, removeBook } from "@/lib/redux/librarySlice"
+
 
 const page = () => {
   const [book, setBook] = useState<Book>();
@@ -32,6 +33,7 @@ const page = () => {
   const isBookSaved = library.some(savedBook => savedBook.id === params.id);
   const {showModal, setShowModal, openModalWithRedirect} = useAuthModal();
 
+  // Need to re-work function. Must check for user. Then check for subscription level before directing to new route
   const handleSampleBook = () => {
     openModalWithRedirect(`/player/${params.id}`);
   }
@@ -72,6 +74,13 @@ const page = () => {
       {showModal && <Login />}
 
       <div className={styles["container"]}>
+
+        {book?.subscriptionRequired ? <div className={styles["premium__content--wrapper"]}>
+          <div className={styles["premium__content"]}>
+            Premium
+          </div>
+        </div> : ""}
+
         <div className={styles["inner__wrapper"]}>
           <div className={styles["inner__book--half"]}>
             <div className={styles["inner__title"]}>

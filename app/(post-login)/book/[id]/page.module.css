@@ -10,6 +10,21 @@
     width: 100%;
   }
 
+  .premium__content--wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .premium__content {
+    padding: 4px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #032b41;
+    background-color: rgb(214, 214, 6);
+  }
+
   .inner__wrapper {
     display: flex;
     gap: 16px;
@@ -74,6 +89,7 @@
     gap: 16px;
     margin-bottom: 24px;
   }
+
   .inner__media--btn {
     display: flex;
     align-items: center;
