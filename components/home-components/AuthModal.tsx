@@ -34,7 +34,8 @@ const Login = () => {
 
     const user = useSelector((state: RootState) => state.auth.user);
     const router = useRouter();
-    const {setShowModal, intendedRoute} = useAuthModal();
+    const tier = useSelector((state: RootState) => state.subscription.tier);
+    const {setShowModal, intendedRoute, subscriptionRequired} = useAuthModal();
 
     
 
@@ -365,7 +366,11 @@ const Login = () => {
         if (user) {
             setShowModal(false);
             if (intendedRoute) {
-                router.push(intendedRoute);
+                if (subscriptionRequired && tier !== "premium") {
+                    router.push("/choose-plan")
+                } else {
+                    router.push(intendedRoute);
+                }
             }
         }
     }, [user]);

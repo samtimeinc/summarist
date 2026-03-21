@@ -8,10 +8,13 @@ import BookTags from "@/components/book-page-components/BookTags"
 import Skeleton from "@/components/Skeleton"
 import { Book } from '@/types/book'
 import { useParams } from "next/navigation"
-import Login from "@/components/home-components/AuthModal"
 import { RootState } from "@/lib/redux/store";
 import { useSelector, useDispatch } from "react-redux";
+import { useRouter } from "next/navigation"
 import { useAuthModal } from '@/context/AuthModalContext';
+import { useCheckuser } from "@/hooks/useCheckUser"
+import { useCheckSubscription } from "@/hooks/useCheckSubscription"
+import Login from "@/components/home-components/AuthModal"
 import { saveBookToLibrary, removeBookFromLibrary } from "@/services/libraryService"
 import { addBook, removeBook } from "@/lib/redux/librarySlice"
 
@@ -30,12 +33,21 @@ const page = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const library = useSelector((state: RootState) => state.library.books);
   const dispatch = useDispatch();
+  const router = useRouter();
+  const {checkUser} = useCheckuser();
+  const {checkSubscription} = useCheckSubscription();
   const isBookSaved = library.some(savedBook => savedBook.id === params.id);
-  const {showModal, setShowModal, openModalWithRedirect} = useAuthModal();
+  const {showModal, setShowModal} = useAuthModal();
 
-  // Need to re-work function. Must check for user. Then check for subscription level before directing to new route
   const handleSampleBook = () => {
-    openModalWithRedirect(`/player/${params.id}`);
+    const intendedRoute = `/player/${params.id}`;
+    if (!checkUser(intendedRoute, book?.subscriptionRequired ?? false)) {
+      return;
+    }
+    if (!checkSubscription(book?.subscriptionRequired ?? false)) {
+      return;
+    }
+    router.push(intendedRoute);
   }
 
   const handleAddToLibrary = async () => {

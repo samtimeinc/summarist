@@ -1,13 +1,15 @@
 'use client'
 
-import { auth } from "@/lib/firebase/firebase";
-import { setUser, clearUser } from "@/lib/redux/userAuthSlice";
-import { setBooks, clearBooks } from "@/lib/redux/librarySlice";
-import { onAuthStateChanged, User } from "firebase/auth";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux"
+import { auth } from "@/lib/firebase/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { initializeAuthPersistence } from "@/services/authService";
+import { setUser, clearUser } from "@/lib/redux/userAuthSlice";
 import { fetchUserLibrary } from "@/services/libraryService";
+import { setBooks, clearBooks } from "@/lib/redux/librarySlice";
+import { fetchUserSubscription } from "@/services/subscriptionService";
+import { clearSubscription, setSubscription } from "@/lib/redux/subscriptionSlice";
 
 const AuthListener = () => {
     const dispatch = useDispatch();
@@ -32,12 +34,19 @@ const AuthListener = () => {
                     document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; SameSite=Strict`;
                     dispatch(setUser(user));
 
-                    const books = await fetchUserLibrary(user.uid);
+                    const [books, tier] = await Promise.all([
+                        fetchUserLibrary(user.uid),
+                        fetchUserSubscription(user.uid),
+                    ]);
+
                     dispatch(setBooks(books));
+                    dispatch(setSubscription(tier));
+
                 } else {
                     document.cookie = "firebase-auth-token=; path=/; max-age=0";
                     dispatch(clearUser());
                     dispatch(clearBooks());
+                    dispatch(clearSubscription());
                 }
             });
         };
