@@ -2,13 +2,17 @@ import { useSelector} from "react-redux";
 import { RootState } from "@/lib/redux/store";
 import { useAuthModal } from "@/context/AuthModalContext";
 
-export const useCheckuser = () => {
+export const useCheckUser = () => {
     const user = useSelector((state: RootState) => state.auth.user);
-    const {openModalWithRedirect} = useAuthModal();
+    const {openModalWithRedirect, setShowModal} = useAuthModal();
 
-    const checkUser = (intendedRoute: string, requireSub: boolean = false): boolean => {
+    const checkUser = (intendedRoute?: string, requireSub: boolean = false): boolean => {
         if (!user) {
-            openModalWithRedirect(intendedRoute, requireSub);
+            if (intendedRoute) {
+                openModalWithRedirect(intendedRoute, requireSub);
+            } else {
+                setShowModal(true);
+            }
             return false;
         }
 

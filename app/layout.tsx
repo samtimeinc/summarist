@@ -5,6 +5,7 @@ import "@/app/globals.css";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import AuthListener from "@/components/AuthListener";
+import { ToastContainer } from "@/components/Toast/ToastNotification";
 
 const robotoSans = Roboto({
   variable: "--font-roboto-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body className={`${robotoSans.variable} ${robotoMono.variable}`}>
         <Providers>
           <AuthListener />
+          <ToastContainer />
           {children}
         </Providers>
       </body>

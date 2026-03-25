@@ -2,21 +2,54 @@
 
 import { useEffect } from "react";
 import { useDispatch } from "react-redux"
+import { AppDispatch } from "@/lib/redux/store";
 import { auth } from "@/lib/firebase/firebase";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { initializeAuthPersistence } from "@/services/authService";
 import { setUser, clearUser } from "@/lib/redux/userAuthSlice";
-import { fetchUserLibrary } from "@/services/libraryService";
 import { setBooks, clearBooks } from "@/lib/redux/librarySlice";
-import { fetchUserSubscription } from "@/services/subscriptionService";
-import { clearSubscription, setSubscription } from "@/lib/redux/subscriptionSlice";
+import { setSubscription, clearSubscription } from "@/lib/redux/subscriptionSlice";
+import { subscribeToLibrary } from "@/services/libraryService";
+import { subscribeToSubscription } from "@/services/subscriptionService";
 
 const AuthListener = () => {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
-        let unsubscribe: (() => void) | undefined;
+        let unsubs: (() => void)[] = [];
 
+        initializeAuthPersistence();
+
+        const authUnsubscribe = onAuthStateChanged(auth, async (user) => {
+            // If user changes, clean up old listeners
+            unsubs.forEach(unsub => unsub());
+            unsubs = [];
+
+            if (user) {
+                // Token management for middleware
+                const token = await user.getIdToken(true);
+                document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; SameSite=Strict`;
+                dispatch(setUser(user));
+
+                // Real-time Library
+                unsubs.push(subscribeToLibrary(user.uid, (books) => {
+                    dispatch(setBooks(books));
+                }));
+
+                // Real-time Subscription
+                unsubs.push(subscribeToSubscription(user.uid, (tier) => {
+                    dispatch(setSubscription(tier));
+                }));
+
+            } else {
+                document.cookie = "firebase-auth-token=; path=/; max-age=0";
+                dispatch(clearUser());
+                dispatch(clearBooks());
+                dispatch(clearSubscription());
+            }
+        });
+
+        // Token Refresh
         const refreshInterval = setInterval(async () => {
             const currentUser = auth.currentUser;
             if (currentUser) {
@@ -25,41 +58,11 @@ const AuthListener = () => {
             }
         }, 55 * 60 * 1000);
 
-        const initAuth = async () => {
-            await initializeAuthPersistence();
-
-            unsubscribe = onAuthStateChanged(auth, async (user: User | null) => {
-                if (user) {
-                    const token = await user.getIdToken(true);
-                    document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; SameSite=Strict`;
-                    dispatch(setUser(user));
-
-                    const [books, tier] = await Promise.all([
-                        fetchUserLibrary(user.uid),
-                        fetchUserSubscription(user.uid),
-                    ]);
-
-                    dispatch(setBooks(books));
-                    dispatch(setSubscription(tier));
-
-                } else {
-                    document.cookie = "firebase-auth-token=; path=/; max-age=0";
-                    dispatch(clearUser());
-                    dispatch(clearBooks());
-                    dispatch(clearSubscription());
-                }
-            });
-        };
-
-        initAuth();
-
         return () => {
+            authUnsubscribe();
             clearInterval(refreshInterval);
-            if (unsubscribe) {
-                unsubscribe();
-            }
-        }
-        
+            unsubs.forEach(unsub => unsub());
+        };
     }, [dispatch]);
 
     return null;

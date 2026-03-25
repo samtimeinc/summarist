@@ -8,15 +8,14 @@ import BookTags from "@/components/book-page-components/BookTags"
 import Skeleton from "@/components/Skeleton"
 import { Book } from '@/types/book'
 import { useParams } from "next/navigation"
-import { RootState } from "@/lib/redux/store";
+import { AppDispatch, RootState } from "@/lib/redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation"
-import { useAuthModal } from '@/context/AuthModalContext';
-import { useCheckuser } from "@/hooks/useCheckUser"
+import { useCheckUser } from "@/hooks/useCheckUser"
 import { useCheckSubscription } from "@/hooks/useCheckSubscription"
-import Login from "@/components/home-components/AuthModal"
 import { saveBookToLibrary, removeBookFromLibrary } from "@/services/libraryService"
 import { addBook, removeBook } from "@/lib/redux/librarySlice"
+import { addToast } from "@/lib/redux/toastSlice"
 
 import { FaRegStar } from "react-icons/fa";
 import { FiClock } from "react-icons/fi";
@@ -26,18 +25,18 @@ import { LuBookText } from "react-icons/lu";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 
 
+
 const page = () => {
   const [book, setBook] = useState<Book>();
 
   const params = useParams();
   const user = useSelector((state: RootState) => state.auth.user);
   const library = useSelector((state: RootState) => state.library.books);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const {checkUser} = useCheckuser();
+  const {checkUser} = useCheckUser();
   const {checkSubscription} = useCheckSubscription();
   const isBookSaved = library.some(savedBook => savedBook.id === params.id);
-  const {showModal, setShowModal} = useAuthModal();
 
   const handleSampleBook = () => {
     const intendedRoute = `/player/${params.id}`;
@@ -51,24 +50,38 @@ const page = () => {
   }
 
   const handleAddToLibrary = async () => {
-    if (!user) {
-      setShowModal(true);
+    const currentRoute = `/book/${params.id}`;
+
+    if (!checkUser(currentRoute)) {
       return;
     }
-    if (book) {
+    if (book && user) {
+      // Store original state if needed
+      const wasBookSaved = isBookSaved;
       try {
-        if (isBookSaved) {
-          await removeBookFromLibrary(user.uid, book);
+        if (wasBookSaved) {
           dispatch(removeBook(book.id));
+          await removeBookFromLibrary(user.uid, book);
+          dispatch(addToast({ message: "Removed from library", type: "info"}));
         } else {
-          await saveBookToLibrary(user.uid, book);
           dispatch(addBook(book));
+          await saveBookToLibrary(user.uid, book);
+          dispatch(addToast({ message: "Added to Library", type: "success"}));
         }
       } catch (error) {
-        console.error("Library operation failed: ", error)
+        console.error("Library operation failed, changes will be rolled back: ", error);
+        if (wasBookSaved) {
+          dispatch(addBook(book));
+        } else {
+          dispatch(removeBook(book.id));
+        }
+        dispatch(addToast({ 
+          message: "Connection error. Please try again.", 
+          type: "error" 
+        }));
       }
     }
-}
+};
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -82,8 +95,6 @@ const page = () => {
     <div className={styles["row"]}>
 
       <audio src={book?.audioLink}></audio>
-
-      {showModal && <Login />}
 
       <div className={styles["container"]}>
 

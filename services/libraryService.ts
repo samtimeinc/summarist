@@ -5,7 +5,10 @@ import { doc,
     setDoc, 
     arrayUnion, 
     arrayRemove } from "firebase/firestore";
+import { onSnapshot } from "firebase/firestore";
 import { Book } from "@/types/book";
+
+
 
 // Fetch all saved books for a given user
 export const fetchUserLibrary = async (userId: string): Promise<Book[]> => {
@@ -20,7 +23,7 @@ export const fetchUserLibrary = async (userId: string): Promise<Book[]> => {
         console.error("Error fetching library:", error);
         return[];
     }
-}
+};
 
 
 
@@ -28,8 +31,8 @@ export const fetchUserLibrary = async (userId: string): Promise<Book[]> => {
 const sanitizeBook = (book: Book): Partial<Book> => {
     return Object.fromEntries(
         Object.entries(book).filter(([_, value]) => value !== undefined)
-    ) as Partial<Book>
-}
+    ) as Partial<Book>;
+};
 
 
 
@@ -43,7 +46,7 @@ export const saveBookToLibrary = async (userId: string, book: Book): Promise<voi
         console.error("Error saving book: ", error);
         throw error;
     }
-}
+};
 
 
 
@@ -57,4 +60,20 @@ export const removeBookFromLibrary = async (userId: string, book: Book): Promise
         console.error("Error removing book: ", error);
         throw error;
     }
-}
+};
+
+
+
+export const subscribeToLibrary = (userId: string, onUpdate: (books: Book[]) => void) => {
+    const docRef = doc(db, "libraries", userId);
+
+    return onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            onUpdate(docSnap.data().books ?? []);
+        } else {
+            onUpdate([]);
+        }
+    }, (error) => {
+        console.error("Library subscription error:", error);
+    });
+};

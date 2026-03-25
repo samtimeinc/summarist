@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase/firebase";
-import { doc,getDoc, setDoc } from "firebase/firestore";
+import { doc,getDoc, onSnapshot, setDoc } from "firebase/firestore";
 import { subscriptionTier } from "@/types/subscription";
 
 
@@ -16,7 +16,7 @@ export const fetchUserSubscription = async (userId: string): Promise<subscriptio
         console.error("Error fetching subscription:", error);
         return null;
     }
-}
+};
 
 
 
@@ -28,4 +28,17 @@ export const setUserSubscription = async (userId: string, tier: subscriptionTier
         console.error("Error setting subscription:", error);
         throw error;
     }
-}
+};
+
+
+
+export const subscribeToSubscription = (userId: string, onUpdate: (tier: subscriptionTier) => void) => {
+    const docRef = doc(db, "subscriptions", userId);
+    return onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            onUpdate(docSnap.data().tier ?? null);
+        } else {
+            onUpdate(null);
+        }
+    });
+};

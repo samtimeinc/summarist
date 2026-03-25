@@ -5,9 +5,11 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation"; 
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { logoutUser, throwError } from "@/services/authService";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/redux/store";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/lib/redux/store";
 import { useAuthModal } from "@/context/AuthModalContext";
+import { addToast } from "@/lib/redux/toastSlice";
+
 import { AiOutlineHome } from "react-icons/ai";
 import { RiBallPenLine } from "react-icons/ri";
 import { IoSettingsOutline, 
@@ -27,6 +29,7 @@ function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
   const width = useWindowWidth();
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch<AppDispatch>();
   const {setShowModal} = useAuthModal();
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState<boolean>(false);
 
@@ -86,9 +89,9 @@ function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
   const handleLogout = async () => {
     try {
       setShowLogoutConfirmation(false);
-      console.log(user);
       await logoutUser();
-      router.push('/sign-in');
+      router.push('/for-you');
+      dispatch(addToast({ message: "You have logged out", type: "success"}))
     } catch (error) {
       setShowLogoutConfirmation(false);
       const message = throwError(error);
