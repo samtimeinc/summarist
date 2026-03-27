@@ -4,7 +4,7 @@ import "@/app/globals.css"
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation"; 
 import { useWindowWidth } from "@/hooks/useWindowWidth";
-import { logoutUser, throwError } from "@/services/authService";
+import { getErrorMessage, logoutUser } from "@/services/authService";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/lib/redux/store";
 import { useAuthModal } from "@/context/AuthModalContext";
@@ -91,11 +91,15 @@ function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
       setShowLogoutConfirmation(false);
       await logoutUser();
       router.push('/for-you');
-      dispatch(addToast({ message: "You have logged out", type: "success"}))
+      dispatch(addToast({ 
+        title: "Signed out", 
+        message: "You have logged out successfully.", 
+        type: "success"}));
     } catch (error) {
       setShowLogoutConfirmation(false);
-      const message = throwError(error);
-      alert(`There was an issuing logging out. Please try again.\n\n${message}`)
+      console.error("There was an issue logging out: ", error);
+      const message = getErrorMessage(error) || "Log out failed.";
+      dispatch(addToast({ title: "Error", message, type: "error" }))
     }
   }
 

@@ -15,10 +15,10 @@
     color: white;
     cursor: pointer;
     animation: slideIn 0.3s ease-out;
-    
+
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     max-width: 350px;
-    word-wrap: break-word;
+    word-wrap: wrap;
     user-select: none;
   }
   
@@ -29,4 +29,15 @@
   @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
+  }
+
+  .toast__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #042330;
+  }
+
+  .toast__message {
+    font-size: 14px;
+    color: #042330;
   }

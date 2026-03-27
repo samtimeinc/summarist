@@ -18,7 +18,8 @@ export const ToastContainer = () => {
         className={`${styles["toast"]} ${styles[toast.type]}`}
         onClick={() => dispatch(removeToast(toast.id))}
       >
-        {toast.message}
+        {toast.title && <div className={styles["toast__title"]}>{toast.title}</div>}
+        <div className={styles["toast__message"]}>{toast.message}</div>
         {/* Auto-remove after 4 seconds */}
         <AutoTimer onExpiry={() => dispatch(removeToast(toast.id))} />
       </div>

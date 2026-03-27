@@ -8,13 +8,15 @@ import { loginWithGoogle,
     loginAsGuest, 
     passwordReset, 
     registerWithEmail, 
-    throwError } from '@/services/authService';
+    getErrorMessage } from '@/services/authService';
 import LoadingAnimation from '../LoadingAnimation';
 import Skeleton from '../Skeleton';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/lib/redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useRouter } from 'next/navigation';
 import { useAuthModal } from '@/context/AuthModalContext';
+import { addToast } from "@/lib/redux/toastSlice";
+
 
 import { FaUser } from "react-icons/fa";
 import { IoClose } from 'react-icons/io5';
@@ -35,6 +37,7 @@ const Login = () => {
     const user = useSelector((state: RootState) => state.auth.user);
     const router = useRouter();
     const tier = useSelector((state: RootState) => state.subscription.tier);
+    const dispatch = useDispatch<AppDispatch>();
     const {setShowModal, intendedRoute, subscriptionRequired} = useAuthModal();
 
     
@@ -60,8 +63,9 @@ const Login = () => {
         } catch (error) {
             setLoadingMode("noLoad");
             setToggleDisabled(false);
-            const message = throwError(error);
-            alert(`Login as guest failed. Please try again.\n\n${message}`);
+            console.error("Log in as guest failed: ", error)
+            const message = getErrorMessage(error) || "Guest login failed.";
+            dispatch(addToast({ title: "Error", message, type: "error"}));
         }
     }
 
@@ -73,8 +77,9 @@ const Login = () => {
         } catch (error) {
             setLoadingMode("noLoad");
             setToggleDisabled(false);
-            const message = throwError(error);
-            alert(`There was an issue logging in with Google. Please try again.\n\n${message}`);
+            console.error("Login with Google failed: ", error)
+            const message = getErrorMessage(error) || "Login with Google failed.";
+            dispatch(addToast({ title: "Error", message, type: "error"}));
         }
     }
 
@@ -87,8 +92,9 @@ const Login = () => {
         } catch (error) {
             setLoadingMode("noLoad");
             setToggleDisabled(false);
-            const message = throwError(error);
-            alert(`Please check your email and/or password and try again.\n\n${message}`);
+            console.error("Login with email failed: ", error)
+            const message = getErrorMessage(error) || "Login with email failed.";
+            dispatch(addToast({ title: "Error", message, type: "error"}));
         }
     }
 
@@ -97,10 +103,16 @@ const Login = () => {
         try {
             await passwordReset(pwResetEmail);
             setLoadingMode("pwReset");
+            dispatch(addToast({
+                title: "Success",
+                message: "Reset link sent to your email.",
+                type: "success",
+            }))
         } catch (error) {
             setLoadingMode("noLoad");
-            const message = throwError(error);
-            alert(`Reset password failed. Please try again.\n\n${message}`);
+            console.error("Password reset error: ", error)
+            const message = getErrorMessage(error) || "Could not send reset link.";
+            dispatch(addToast({ title: "Error", message, type: "error"}));
         }
     }
 
@@ -110,11 +122,17 @@ const Login = () => {
         setToggleDisabled(true);
         try {
             await registerWithEmail(createEmail, createPassword);
+            dispatch(addToast({
+                title: "Account created",
+                message: "Welcome to Summarist!",
+                type: "success",
+            }))
         } catch (error) {
             setLoadingMode("noLoad");
             setToggleDisabled(false);
-            const message = throwError(error);
-            alert(`Failed to create an account. Please try again.\n\n${message}`);
+            console.error("Registration error: ", error)
+            const message = getErrorMessage(error) || "Failed to create account.";
+            dispatch(addToast({ title: "Registration failed", message, type: "error"}));
         }
     }
 
