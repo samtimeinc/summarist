@@ -1,7 +1,5 @@
-'use client'
 
 import "@/app/globals.css"
-import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation"; 
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { getErrorMessage, logoutUser } from "@/services/authService";
@@ -19,22 +17,27 @@ import { IoSettingsOutline,
   IoBookmarkOutline  } from "react-icons/io5";
 import { MdLogout, MdLogin  } from "react-icons/md";
 
+
+
 interface SideNavBarProp {
   showSideBar: boolean;
-  setShowSideBar: React.Dispatch<React.SetStateAction<boolean>>;
+  showLogoutConfirmation: boolean;
+  setShowLogoutConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
+  closeSideBar: () => void;
 }
 
-function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
+
+
+function SideNavBar({ showSideBar, showLogoutConfirmation, setShowLogoutConfirmation, closeSideBar }: SideNavBarProp) {
   const pathName = usePathname();
   const width = useWindowWidth();
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch<AppDispatch>();
   const {setShowModal} = useAuthModal();
-  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState<boolean>(false);
 
   const handleRouting = (route: string) => {
-    setShowSideBar(false);
+    closeSideBar();
     router.push(route);
   }
 
@@ -55,7 +58,7 @@ function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
   
   const displayLogoutLink = () => {
     return (
-      <div className='sideBar__link--wrapper enabled-link' onClick={() => setShowLogoutConfirmation(!showLogoutConfirmation)} >
+      <div className='sideBar__link--wrapper enabled-link' onClick={() => setShowLogoutConfirmation(true)} >
         <div className='sideBar__link--highlighter'></div>
         <div className='sideBar__icon--wrapper' >
           <MdLogout />
@@ -65,7 +68,7 @@ function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
     )
   }
 
-  const displayConfirmation = () => {
+  const displayLogoutConfirmation = () => {
     return (
       <div className="logout-confirmation">
         <div className="logout__confirmation--wrapper">
@@ -78,8 +81,13 @@ function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
           </div>
           <div className="confirmation__button--wrapper">
             <button 
-            className="confirmation__button confirmation-red" 
-            onClick={() => setShowLogoutConfirmation(!showLogoutConfirmation)} >Cancel</button>
+              className="confirmation__button confirmation-red" 
+              onClick={() => {
+                setShowLogoutConfirmation(false);
+                setShowModal(false);
+              }} >
+              Cancel
+            </button>
           </div>       
         </div>
       </div>
@@ -88,7 +96,7 @@ function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
 
   const handleLogout = async () => {
     try {
-      setShowLogoutConfirmation(false);
+      closeSideBar();
       await logoutUser();
       router.push('/for-you');
       dispatch(addToast({ 
@@ -96,7 +104,7 @@ function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
         message: "You have logged out successfully.", 
         type: "success"}));
     } catch (error) {
-      setShowLogoutConfirmation(false);
+      closeSideBar();
       console.error("There was an issue logging out: ", error);
       const message = getErrorMessage(error) || "Log out failed.";
       dispatch(addToast({ title: "Error", message, type: "error" }))
@@ -107,7 +115,7 @@ function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
     <div className={`sideBar ${(width && width <= 768 && showSideBar) ? 'sideBar__modal' : ""}`}>
       {width && width <= 768 ? 
         <div className="sideBar__modal--exit">
-            <IoClose onClick={() => setShowSideBar(!showSideBar)}/>
+            <IoClose onClick={() => closeSideBar() }/>
         </div> : ""}
 
       <figure className='sideBar__logo'>
@@ -156,7 +164,7 @@ function SideNavBar({showSideBar, setShowSideBar}: SideNavBarProp) {
 
 
           { showLogoutConfirmation ? (
-            displayConfirmation()
+            displayLogoutConfirmation()
           ) : (
 
             <>

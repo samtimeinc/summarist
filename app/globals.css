@@ -166,6 +166,7 @@ button:disabled {
   background-color: #fff;
   border-bottom: 1px solid #e1e7ea;
   height: 80px;
+  z-index: 10;
 }
 
 .search__wrapper {
@@ -461,7 +462,7 @@ button:disabled {
   width: 200px;
   background-color: #f7faf9;
   transition: all 300ms ease-in-out;
-  z-index: 11;
+  z-index: 30;
 }
 
 @media (max-width: 768) {
@@ -645,7 +646,7 @@ button:disabled {
   height: 100%;
   background-color: #3a4649cc;
   transition: opacity 400ms ease 0ms;
-  z-index: 10;
+  z-index: 20;
   pointer-events: auto;
 }
 

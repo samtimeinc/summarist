@@ -1,6 +1,6 @@
 
 import "@/app/globals.css"
-import React, { useEffect, useState, useRef  } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -13,17 +13,18 @@ import SearchResult from "./SearchResult";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { useRouter } from "next/navigation";
 
-
 import { IoSearch, IoClose } from "react-icons/io5";
 import { IoIosMenu } from "react-icons/io";
 
+
+
 interface SearchProp {
-    showSideBar: boolean;
-    setShowSideBar: React.Dispatch<React.SetStateAction<boolean>>;
     toggleSideBar: () => void;
 }
 
-const Search = ({showSideBar, setShowSideBar, toggleSideBar}: SearchProp) => {
+
+
+const Search = ({ toggleSideBar }: SearchProp) => {
         const [search, setSearch] = useState<string>("")
         const [results, setResults] = useState<Book[]>([]);
         const [loading, setLoading] = useState<boolean>(false);
@@ -58,7 +59,6 @@ const Search = ({showSideBar, setShowSideBar, toggleSideBar}: SearchProp) => {
                     setSearch("");
                     setResults([]);
                 }
-
             }
         }
 
@@ -128,10 +128,6 @@ const Search = ({showSideBar, setShowSideBar, toggleSideBar}: SearchProp) => {
                     {(search.length > 0 && (loading || debouncedSearch === search)) && 
                         (<SearchResult results={results} loading={loading} activeIndex={activeIndex} />) }
             </div>
-            
-            {width != null && width <= 768 ? 
-                <div className={`sideBar__overlay ${!showSideBar ? 'sideBar__overlay--hidden' : ""}`} 
-                onClick={() => setShowSideBar(!showSideBar)}></div> : ""}
         </div>
     )
 }
