@@ -1,0 +1,242 @@
+.summary {
+    position: relative;
+    width: 100%;
+    overflow-y: auto;
+    height: calc(100vh - 160px);
+}
+
+.ebook__summary {
+    white-space: pre-line;
+    padding: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.premium__content--wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .premium__content {
+    padding: 4px 16px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #032b41;
+    background-color: rgb(214, 214, 6);
+  }
+
+.ebook__summary--title {
+    color: #032b41;
+    font-size: 24px;
+    font-weight: bold;
+    border-bottom: 2px solid #e1e7ea;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    line-height: 1.5;
+}
+
+.ebook__summary--text {
+    white-space: pre-line;
+    line-height: 1.4;
+    color: #032b41;
+}
+
+.audio__player--wrapper {
+    width: 100%;
+    height: 80px;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #042330;
+    padding: 0 40px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.audio__track--wrapper,
+.audio__controls--wrapper,
+.audio__progress--wrapper {
+    width: calc(100% / 3);
+}
+
+.audio__track--wrapper {
+    display: flex;
+    gap: 12px;
+}
+
+.audio__track--image-mask {
+    display: flex;
+    max-width: 48px;
+}
+
+.book__image--wrapper {
+    min-width: 48px;
+    width: 48px;
+}
+
+.book__image {
+    width: 100%;
+}
+
+.audio__track--details-wrapper {
+    color: #fff;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+}
+
+.audio__track--author {
+    color: #bac8ce;
+}
+
+.audio__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.audio__controls--btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    /* outline: none;
+    border: none;
+    background-color: transparent; */
+    color: #fff;
+}
+
+.audio__controls--btn svg {
+    width: 28px;
+    height: 28px;
+    stroke: #fff;
+    transition: all .2s;
+}
+
+.audio__controls--btn svg:hover {
+    stroke: #2bd97c
+}
+
+.audio__controls--btn svg path {
+    stroke: #fff;
+    stroke-width: 1.5px
+}
+
+.audio__controls--btn-play {
+    background-color: #fff;
+    width: 40px;
+    height: 40px;
+    /* outline: none;
+    border: none; */
+    color: black;
+}
+
+.audio__controls--btn-play svg {
+    width: 24px;
+    height: 24px;
+    color: #042330;
+    display: flex;
+}
+
+.audio__controls--play-icon {
+    margin-left: 4px;
+}
+
+.audio__progress--wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.audio__time {
+    color: #fff;
+    font-size: 14px;
+}
+
+.audio__progress--bar {
+    border-radius: 8px;
+    height: 4px;
+    max-width: 300px;
+    width: 100%;
+    cursor: pointer;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right, rgb(43, 217, 124) 0%, rgb(109, 120, 125) 0%);
+    --range-progress: 0%;
+}
+
+.audio__progress--bar::-webkit-slider-thumb {
+    border: 6px solid #fff;
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.audio__book--spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.audio__book--spinner svg {
+    width: 64px;
+    height: 64px;
+    color: #032b41;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+@media (max-width: 768px) {
+    .audio__player--wrapper {
+        height:180px;
+        padding: 16px 24px;
+        flex-direction: column;
+    }
+
+    .audio__track--wrapper,
+    .audio__controls--wrapper,
+    .audio__progress--wrapper {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .audio__track--image-mask {
+        max-width: 80px;
+    }
+
+    .ebook__summary--title {
+        font-size: 20px;
+    }
+
+    .ebook__summary--text {
+        font-size: 14px;
+    }
+
+    .summary {
+        height: calc(100vh - 260px);
+    }
+}

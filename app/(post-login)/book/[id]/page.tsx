@@ -86,7 +86,7 @@ const page = () => {
   useEffect(() => {
     const fetchBook = async () => {
       const {data} = await axios.get(`https://us-central1-summaristt.cloudfunctions.net/getBook?id=${params.id}`);
-      setBook(data || {});
+      setBook(data);
     }
     fetchBook();
   },[params.id]);

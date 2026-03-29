@@ -35,6 +35,10 @@ function SideNavBar({ showSideBar, showLogoutConfirmation, setShowLogoutConfirma
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch<AppDispatch>();
   const {setShowModal} = useAuthModal();
+  const isPlayerPage: boolean = pathName ? pathName.includes("/player") : false;
+
+  console.log("Current Path:", pathName, "Is Player Page:", isPlayerPage);
+
 
   const handleRouting = (route: string) => {
     closeSideBar();
@@ -70,11 +74,11 @@ function SideNavBar({ showSideBar, showLogoutConfirmation, setShowLogoutConfirma
 
   const displayLogoutConfirmation = () => {
     return (
-      <div className="logout-confirmation">
+      <div className="logout__confirmation">
         <div className="logout__confirmation--wrapper">
           <div className='confirmation__text--wrapper' >
-            <div className='sideBar__link--highlighter sideBar__link--activeHighlighter'></div>
-            <div className='sideBar__link--text'>Ready to log out?</div>
+            <div className='sideBar__link--highlighter '></div>
+            <div className='confirmation__title'>Ready to log out?</div>
           </div>
           <div className="confirmation__button--wrapper">
             <button className="confirmation__button confirmation-green" onClick={() => handleLogout()}>Log out</button>
@@ -112,7 +116,11 @@ function SideNavBar({ showSideBar, showLogoutConfirmation, setShowLogoutConfirma
   }
 
   return (
-    <div className={`sideBar ${(width && width <= 768 && showSideBar) ? 'sideBar__modal' : ""}`}>
+    <div className={
+      `sideBar 
+      ${(width && width <= 768 && showSideBar) ? 'sideBar__modal' : ""} 
+      ${isPlayerPage ? 'sideBar__for-player-page' : ""}`}>
+
       {width && width <= 768 ? 
         <div className="sideBar__modal--exit">
             <IoClose onClick={() => closeSideBar() }/>
@@ -122,7 +130,7 @@ function SideNavBar({ showSideBar, showLogoutConfirmation, setShowLogoutConfirma
         {width && width > 380 ? <img src="/logo.png" alt="logo" /> : ""}
       </figure>
 
-      <div className='sideBar__wrapper'>
+      <div className={`sideBar__wrapper ${isPlayerPage ? 'sideBar__wrapper-for-player-page' : ""}`}>
 
         <div className='sideBar__top'>
           <div className='sideBar__link--wrapper enabled-link' onClick={() => handleRouting("/for-you")} >
