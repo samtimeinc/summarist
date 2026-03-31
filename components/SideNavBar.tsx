@@ -37,9 +37,6 @@ function SideNavBar({ showSideBar, showLogoutConfirmation, setShowLogoutConfirma
   const {setShowModal} = useAuthModal();
   const isPlayerPage: boolean = pathName ? pathName.includes("/player") : false;
 
-  console.log("Current Path:", pathName, "Is Player Page:", isPlayerPage);
-
-
   const handleRouting = (route: string) => {
     closeSideBar();
     router.push(route);
