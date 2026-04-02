@@ -385,7 +385,7 @@ const Login = () => {
             setShowModal(false);
             if (intendedRoute) {
                 if (subscriptionRequired && tier !== "premium") {
-                    router.push("/choose-plan")
+                    router.push("/settings")
                 } else {
                     router.push(intendedRoute);
                 }

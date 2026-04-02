@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+.container {
+    font-family: "Roboto";
+    padding: 40px 0;
+    width: 100%;
+  }
+  
+  .row {
+    max-width: 1070px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .gatekeeper__title {
+    font-size: 36px;
+    font-weight: 500;
+  }
+
+  .gatekeeper__title {
+    text-align: center;
+    margin: 64px 0;
+  }
+
+  .gatekeeper__options--wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .gatekeeper__login--wrapper,
+  .gatekeeper__tier--wrapper, 
+  .gatekeeper__create--wrapper {
+    padding: 16px;
+    border: 2px solid lightgray;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: all 200ms ease-in-out;
+  }
+
+  .gatekeeper__login--wrapper:hover,
+  .gatekeeper__tier--wrapper:hover,
+  .gatekeeper__create--wrapper:hover {
+    scale: 1.02;
+  }
+  .gatekeeper__login--wrapper:active,
+  .gatekeeper__tier--wrapper:active,
+  .gatekeeper__create--wrapper:active {
+    transform: translateY(6px);
+  }
+
+  .options__image--wrapper {
+    width: 360px;
+    height: 360px;
+  }
+
+  .options__image--wrapper svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .options__title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 500;
+  }

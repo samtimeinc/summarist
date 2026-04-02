@@ -8,7 +8,7 @@ export const useCheckSubscription = () => {
 
     const checkSubscription = (subscriptionRequired: boolean): boolean => {
         if (subscriptionRequired && tier !== "premium") {
-            router.push("/choose-plan")
+            router.push("/settings")
             return false;
         }
 

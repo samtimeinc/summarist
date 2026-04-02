@@ -11,10 +11,10 @@ export const fetchUserSubscription = async (userId: string): Promise<subscriptio
         if (docSnap.exists()) {
             return docSnap.data().tier ?? null;
         }
-        return null;
+        return "free";
     } catch (error) {
         console.error("Error fetching subscription:", error);
-        return null;
+        return "free";
     }
 };
 
@@ -38,7 +38,7 @@ export const subscribeToSubscription = (userId: string, onUpdate: (tier: subscri
         if (docSnap.exists()) {
             onUpdate(docSnap.data().tier ?? null);
         } else {
-            onUpdate(null);
+            onUpdate("free");
         }
     });
 };

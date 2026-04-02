@@ -7,6 +7,7 @@ export function proxy(request: NextRequest) {
     const token = request.cookies.get('firebase-auth-token');
     const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route));
 
+
     if (isProtectedRoute && !token) {
         return NextResponse.redirect(new URL('/sign-in', request.url));
     }
@@ -15,7 +16,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/my-library', '/settings', '/player']
+    matcher: ['/my-library', '/settings', '/player/:path*']
 };
 
 /*

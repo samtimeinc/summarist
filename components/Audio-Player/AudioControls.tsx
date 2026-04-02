@@ -4,8 +4,8 @@ import styles from "@/app/(post-login)/player/[id]/page.module.css"
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAudioPlayerContext } from "@/context/AudioPlayerContext";
 
-import TenSecondRewindIcon from "./TenSecondRewindIcon";
-import TenSecondFForwardIcon from "./TenSecondFForwardIcon";
+import TenSecondRewindIcon from "../TenSecondRewindIcon";
+import TenSecondFForwardIcon from "../TenSecondFForwardIcon";
 import { FaPause, FaPlay } from "react-icons/fa";
 
 
@@ -20,9 +20,9 @@ export const AudioControls = () => {
         if (audioRef.current) {
             audioRef.current.currentTime -= 10;
             updateProgress();
-        }
-        
+        }   
     };
+
     const skipForward = () => {
         if (audioRef.current) {
             audioRef.current.currentTime += 10;
@@ -78,8 +78,10 @@ export const AudioControls = () => {
             if (playAnimationRef.current !== null) {
                 cancelAnimationFrame(playAnimationRef.current);
             }
-        };
-    }, [isAudioPlaying, startAnimation, updateProgress, audioRef])
+        };        
+    }, [isAudioPlaying, startAnimation, updateProgress, audioRef]);
+
+
 
     return (
         <div className={styles["audio__controls--wrapper"]}>

@@ -1,5 +1,5 @@
 
-import styles from "@/app/(post-login)/player/[id]/page.module.css"
+
 import inputStyles from "@/styles/progress-bar.module.css"
 import { useAudioPlayerContext } from '@/context/AudioPlayerContext'
 
@@ -38,10 +38,9 @@ export const ProgressBar = () => {
           type="range" 
           ref={progressRef} 
           defaultValue="0" 
+          max={duration || 0}
           id={inputStyles['track__progress--bar']} 
-          className={styles["audio__progress--bar"]} 
           onChange={handleProgressChange}/>
-        {/* <input type="range" name="" id="progess-bar" className={styles["audio__progress--bar"]} /> */}
         <div className={inputStyles["audio__time"]}>{formatTime(duration)}</div>
     </div>
   )

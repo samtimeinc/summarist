@@ -12,11 +12,13 @@ import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
 
 
 const LayoutContent = ({children}: {children: React.ReactNode}) => {
-    const {showModal} = useAuthModal();
     const [showSideBar, setShowSideBar] = useState<boolean>(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState<boolean>(false);
 
     const width = useWindowWidth();
+    const {showModal} = useAuthModal();
+
+
 
     const toggleSideBar = () => {
         if (showSideBar) {
@@ -54,7 +56,9 @@ const LayoutContent = ({children}: {children: React.ReactNode}) => {
 
                 {showModal && <Login/>}
 
-                    {children}
+
+                {children}
+
             </div>
         </AudioPlayerProvider>
     )

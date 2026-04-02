@@ -11,7 +11,7 @@
 }
 
 /* =========================
-Custom Input range 
+Progress Bar w/ Custom Input range 
 =============================*/
 
 /* Input range - chrome and safari */
@@ -94,4 +94,13 @@ Custom Input range
   #track__progress--bar:active::-moz-range-thumb {
     transform: scale(1.2);
     background-color: rgb(43, 217, 124);
+  }
+
+
+
+  @media (max-width: 768px) {
+    .audio__progress--wrapper {
+      width: 90%;
+      justify-content: center;
+    }
   }
