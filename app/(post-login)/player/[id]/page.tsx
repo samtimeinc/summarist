@@ -9,7 +9,6 @@ import { useParams } from 'next/navigation';
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
 import { selectIsPremiumTier } from "@/lib/redux/subscriptionSlice";
-// import { useAuthModal } from "@/context/AuthModalContext";
 import { AudioBook, useAudioPlayerContext } from '@/context/AudioPlayerContext';
 import { AudioControls } from '@/components/Audio-Player/AudioControls';
 import { AudioDetails } from '@/components/Audio-Player/AudioDetails';
@@ -21,13 +20,12 @@ import Gatekeeper from "@/components/Gatekeeper";
 
 const page = () => {
   const [book, setBook] = useState<Book>();
-  const [isBookPremium, setIsBookPremium] = useState<boolean>(false);
 
   const params = useParams();
   const { setCurrentTrack } = useAudioPlayerContext();
-  // const { openModalWithRedirect } = useAuthModal();
   const isPremiumUser = useSelector(selectIsPremiumTier);
   const isSubscriptionLoading = useSelector((state: RootState) => state.subscription.loading);
+  const isAuthLoading = useSelector((state: RootState) => state.auth.loading);
   const id = useSelector((state: RootState) => state.auth.user?.uid);
   const isGuest = useSelector((state: RootState) => state.auth.user?.isAnonymous);
 
@@ -38,10 +36,8 @@ const page = () => {
       }
 
       const { data } = await axios.get(`https://us-central1-summaristt.cloudfunctions.net/getBook?id=${params.id}`);
-      setIsBookPremium(data?.subscriptionRequired);
 
       if (data.subscriptionRequired && !isPremiumUser) {
-        // openModalWithRedirect(`/player/${params.id}`, true);
         return ;
       }
       const trackData: AudioBook = {
@@ -61,12 +57,14 @@ const page = () => {
     }
   }, [params.id, isPremiumUser, isSubscriptionLoading]);
 
+  // Gatekeeper displays if user is guest or does not have premium subscription
   if (!book) {
     return (
-    <>
-      <Gatekeeper isBookPremium={isBookPremium} id={id} isGuest={isGuest}  />
-      <div className="player__shell"></div>
-    </>
+      <>
+        <Gatekeeper id={id} isGuest={isGuest} isSubscriptionLoading={isSubscriptionLoading} isAuthLoading={isAuthLoading}  />
+        <div className="player__shell"></div>
+      </>
+
     )
   }
 

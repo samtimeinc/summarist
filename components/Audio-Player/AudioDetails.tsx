@@ -22,10 +22,10 @@ export const AudioDetails = () => {
                                 src={currentTrack?.image} 
                                 alt={currentTrack?.title} 
                                 className={styles['book__image']} /> 
-                            ) : (
-                                <IoMdInformationCircleOutline 
-                                    className={styles["audio__track--image-default"]} />
-                            )} 
+                        ) : (
+                            <IoMdInformationCircleOutline 
+                                className={styles["audio__track--image-default"]} />
+                        )} 
                     </figure>
                 ) : (
                     <Skeleton width="48px" height="52px" />

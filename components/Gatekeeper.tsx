@@ -1,32 +1,31 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+
 import styles from "@/styles/gatekeeper.module.css"
-import { useDispatch, useSelector } from 'react-redux'
-// import { RootState } from '@/lib/redux/store'
-import { usePathname, useRouter } from 'next/navigation'
+import { useDispatch } from 'react-redux'
+import { useRouter } from 'next/navigation'
 import { useAuthModal } from '@/context/AuthModalContext'
 import { logoutUser } from '@/services/authService'
 import { addToast } from '@/lib/redux/toastSlice'
+import Skeleton from "./Skeleton"
 
-
-// import LoginSVG from './LoginSVG'
 import ChoosePlanSVG from './ChoosePlanSVG'
 import CreateAccountSVG from './CreateAccountSVG'
 
 interface GatekeeperProp {
-  isBookPremium?: boolean;
   id?: string;  // If id is true, user is logged in
   isGuest?: boolean; // If isGuest is true, user is logged in on a guest account. Prohibited from premium tier
+  isSubscriptionLoading?: boolean;
+  isAuthLoading?: boolean; 
 }
 
 
 
-const Gatekeeper = ({ isBookPremium, id, isGuest }: GatekeeperProp) => {
-  const [showUpgradeToPremium, setShowUpgradeToPremium] = useState<boolean>(false);
+const Gatekeeper = ({ id, isGuest, isSubscriptionLoading, isAuthLoading }: GatekeeperProp) => {
+  const isRegisteredUser = id && !isGuest;
+
 
   const router = useRouter();
-  const pathName = usePathname();
   const { openModalWithRedirect } = useAuthModal();
   const dispatch = useDispatch();
 
@@ -44,33 +43,35 @@ const Gatekeeper = ({ isBookPremium, id, isGuest }: GatekeeperProp) => {
     }
   };
 
-  useEffect(() => {
-    if (id && !isGuest) {
-        setShowUpgradeToPremium(true);
-    }
-  }, [])
-
   return (
     <>
     <div className={styles["container"]}>
       <div className={styles["row"]}>
         <div className={styles["gatekeeper__title"]}>
-          {!showUpgradeToPremium ? "Guests cannot view premium content" : "Premium plan required" }
-          </div>
+          {isSubscriptionLoading || isAuthLoading ? (
+            <Skeleton height="33px"width="400px" />
+          ) : (
+            isRegisteredUser ? "Great books are waiting" : "Sign up today and go Premium!"
+          )}
+        </div>
         <div className={styles["gatekeeper__options--wrapper"]}>
 
           {/* User is logged in as guest or somehow finds this page without first logging in.*/}
-          {!showUpgradeToPremium && 
-            <div className={styles["gatekeeper__create--wrapper"]} onClick={() => handleCreateAccount()} >
-              <figure className={styles["options__image--wrapper"]}>
-                <CreateAccountSVG />
-              </figure>
-              <div className={styles["options__title"]}>Create an account</div>
-          </div>
-          }
+          {isSubscriptionLoading || isAuthLoading ? (
+            <Skeleton width="400px" height="420px" />
+          ) : (
+            !isRegisteredUser &&  
+              (<div className={styles["gatekeeper__create--wrapper"]} onClick={() => handleCreateAccount()} >
+                <figure className={styles["options__image--wrapper"]}>
+                  <CreateAccountSVG />
+                </figure>
+                <div className={styles["options__title"]}>Create an account</div>
+              </div>)
+          )}
 
-          {/* User is logged, User is not a guest, and user is not a premium subscriber */}
-          { showUpgradeToPremium && 
+          {/* User is logged in but not a guest. User is not a premium subscriber */}
+
+          {isRegisteredUser && 
             <div className={styles["gatekeeper__tier--wrapper"]} onClick={() => router.push("/settings")} >
               <figure className={styles["options__image--wrapper"]}>
                 <ChoosePlanSVG />
@@ -78,9 +79,6 @@ const Gatekeeper = ({ isBookPremium, id, isGuest }: GatekeeperProp) => {
               <div className={styles["options__title"]}>Upgrade to Premium</div>
             </div>
           }
-
-
-          
         </div>
       </div>
     </div>
