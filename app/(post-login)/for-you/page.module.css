@@ -92,12 +92,12 @@
 }
 
 .selected__book--author,
-.audio__controls div {
+.selected__play div {
     font-size: 14px;
     color: #032b41;
 }
 
-.audio__controls {
+.selected__play {
     display: flex;
     align-items: center;
     gap: 8px;

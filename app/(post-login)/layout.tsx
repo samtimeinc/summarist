@@ -11,7 +11,7 @@ import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
 
 
 
-const LayoutContent = ({children}: {children: React.ReactNode}) => {
+const LayoutPostLogin = ({children}: {children: React.ReactNode}) => {
     const [showSideBar, setShowSideBar] = useState<boolean>(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState<boolean>(false);
 
@@ -71,8 +71,8 @@ export default function AuthenticatedLayout({
 }>) {
 
     return (
-        <LayoutContent>
+        <LayoutPostLogin>
             {children}
-        </LayoutContent>
+        </LayoutPostLogin>
     )
 }

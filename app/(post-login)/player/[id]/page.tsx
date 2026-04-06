@@ -1,106 +1,13 @@
-"use client"
-
-import styles from "./page.module.css"
-import "@/app/globals.css"
-import { useEffect, useState } from 'react'
 import axios from 'axios';
 import { Book } from '@/types/book';
-import { useParams } from 'next/navigation';
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/redux/store";
-import { selectIsPremiumTier } from "@/lib/redux/subscriptionSlice";
-import { AudioBook, useAudioPlayerContext } from '@/context/AudioPlayerContext';
-import { AudioControls } from '@/components/Audio-Player/AudioControls';
-import { AudioDetails } from '@/components/Audio-Player/AudioDetails';
-import { ProgressBar } from '@/components/Audio-Player/AudioProgressBar';
-import Skeleton from '@/components/Skeleton';
-import Gatekeeper from "@/components/Gatekeeper";
+import PlayerPageClient from './PlayerPageClient';
 
 
 
-const page = () => {
-  const [book, setBook] = useState<Book>();
+export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
+ const { id } = await params;
+ const  { data: book } = await axios.get<Book>(
+  `https://us-central1-summaristt.cloudfunctions.net/getBook?id=${id}`);
 
-  const params = useParams();
-  const { setCurrentTrack } = useAudioPlayerContext();
-  const isPremiumUser = useSelector(selectIsPremiumTier);
-  const isSubscriptionLoading = useSelector((state: RootState) => state.subscription.loading);
-  const isAuthLoading = useSelector((state: RootState) => state.auth.loading);
-  const id = useSelector((state: RootState) => state.auth.user?.uid);
-  const isGuest = useSelector((state: RootState) => state.auth.user?.isAnonymous);
-
-  useEffect(() => {
-    const fetchBook = async () => {
-      if (isSubscriptionLoading) {
-        return;
-      }
-
-      const { data } = await axios.get(`https://us-central1-summaristt.cloudfunctions.net/getBook?id=${params.id}`);
-
-      if (data.subscriptionRequired && !isPremiumUser) {
-        return ;
-      }
-      const trackData: AudioBook = {
-        title: data.title,
-        author: data.author,
-        src: data.audioLink,
-        image: data.imageLink
-      }
-      setBook(data);
-      setCurrentTrack(trackData);
-    }
-
-    fetchBook();
-    // Cleanup: Wipes the context clean when leaving the route
-    return () => {
-      setCurrentTrack(null);
-    }
-  }, [params.id, isPremiumUser, isSubscriptionLoading]);
-
-  // Gatekeeper displays if user is guest or does not have premium subscription
-  if (!book) {
-    return (
-      <>
-        <Gatekeeper id={id} isGuest={isGuest} isSubscriptionLoading={isSubscriptionLoading} isAuthLoading={isAuthLoading}  />
-        <div className="player__shell"></div>
-      </>
-
-    )
-  }
-
-  return (
-    <div className={styles["summary"]}>
-        
-      <div className={styles["ebook__summary"]} style={{}} >
-
-        {book?.subscriptionRequired && <div className={styles["premium__content--wrapper"]}>
-          <div className={styles["premium__content"]}>Premium</div>
-        </div>}
-
-        <div className={styles["ebook__summary--title"]}>{ book ? book?.title : <Skeleton height='40px' width='680px' />}</div>
-        <div className={styles["ebook__summary--text"]}>
-          { book ? (
-            book?.summary
-          ) : (
-            <>
-            <Skeleton height='160px' width='752px' marginBottom='32px' />
-            <Skeleton height='160px' width='752px' marginBottom='32px' />
-            <Skeleton height='160px' width='752px' marginBottom='32px' />
-            <Skeleton height='160px' width='752px' marginBottom='32px' />
-            <Skeleton height='160px' width='752px' marginBottom='32px' />
-            <Skeleton height='160px' width='752px' marginBottom='32px' />
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className={styles["audio__player--wrapper"]}>
-        <AudioDetails />
-        <AudioControls />
-        <ProgressBar />
-      </div>
-    </div>
-  )
+ return <PlayerPageClient book={book} />;
 }
-
-export default page

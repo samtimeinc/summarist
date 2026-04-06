@@ -1,7 +1,7 @@
 "use client"
 
 import styles from "@/app/(post-login)/player/[id]/page.module.css"
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAudioPlayerContext } from "@/context/AudioPlayerContext";
 
 import TenSecondRewindIcon from "../TenSecondRewindIcon";
@@ -11,10 +11,16 @@ import { FaPause, FaPlay } from "react-icons/fa";
 
 
 export const AudioControls = () => {
-    const [isAudioPlaying, setIsAudioPlaying] = useState<Boolean>(false);
+    const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false);
 
-    const { currentTrack, audioRef, duration, setDuration, setTimeProgress, progressRef } = useAudioPlayerContext();
-    const playAnimationRef = useRef<number | null>(null);
+    const { 
+        currentTrack, 
+        audioRef, 
+        onLoadedMetaData, 
+        updateProgress, 
+        startAnimation, 
+        playAnimationRef 
+    } = useAudioPlayerContext();
 
     const skipBackward = () => {
         if (audioRef.current) {
@@ -29,38 +35,6 @@ export const AudioControls = () => {
             updateProgress();
         }
     };
-
-    const onLoadedMetaData = () => {
-        const seconds = audioRef.current?.duration;
-        if (seconds !== undefined) {
-            setDuration(seconds);
-            if (progressRef.current) {
-                progressRef.current.max = seconds.toString();
-            }
-        }
-    };
-
-    const updateProgress = useCallback(() => {
-        if (audioRef.current && progressRef.current && duration) {
-            const currrentTime = audioRef.current.currentTime;
-            setTimeProgress(currrentTime);
-            progressRef.current.value = currrentTime.toString();
-            progressRef.current.style.setProperty(
-                '--range-progress',
-                `${(currrentTime / duration) * 100}%`
-            );
-        }
-    }, [duration, setTimeProgress, audioRef, progressRef]);
-
-    const startAnimation = useCallback(() => {
-        if (audioRef.current && progressRef.current && duration) {
-            const animate = () => {
-                updateProgress();
-                playAnimationRef.current = requestAnimationFrame(animate);
-            };
-            playAnimationRef.current = requestAnimationFrame(animate);
-        }
-    }, [updateProgress, duration, audioRef, progressRef]);
 
     useEffect(() => {
         if (isAudioPlaying) {
@@ -80,8 +54,6 @@ export const AudioControls = () => {
             }
         };        
     }, [isAudioPlaying, startAnimation, updateProgress, audioRef]);
-
-
 
     return (
         <div className={styles["audio__controls--wrapper"]}>
