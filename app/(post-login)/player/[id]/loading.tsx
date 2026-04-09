@@ -1,8 +1,8 @@
 import styles from "./page.module.css"
 import Skeleton from '@/components/Skeleton';
 import { AudioDetailsSkeleton } from "@/components/Audio-Player/AudioDetailsSkeleton";
-import { AudioControls } from "@/components/Audio-Player/AudioControls";
 import { AudioProgressBarSkeleton } from "@/components/Audio-Player/AudioProgressBarSkeleton";
+import { AudioControlsSkeleton } from "@/components/Audio-Player/AudioControlsSkeleton";
 
 export default function Loading() {
     return (
@@ -25,7 +25,7 @@ export default function Loading() {
 
             <div className={styles["audio__player--wrapper"]}>
                 <AudioDetailsSkeleton />
-                <AudioControls />
+                <AudioControlsSkeleton />
                 <AudioProgressBarSkeleton />
             </div>
         </div>

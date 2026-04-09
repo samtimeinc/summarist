@@ -9,7 +9,7 @@ export function proxy(request: NextRequest) {
 
 
     if (isProtectedRoute && !token) {
-        return NextResponse.redirect(new URL('/sign-in', request.url));
+        return NextResponse.redirect(new URL('/log-in', request.url));
     }
 
     return NextResponse.next();

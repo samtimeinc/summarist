@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
 import { selectIsPremiumTier } from "@/lib/redux/subscriptionSlice";
 import Gatekeeper from "@/components/Gatekeeper";
+import { useFontSize } from "@/context/FontSizeContext";
 
 import { useAudioPlayerContext } from '@/context/AudioPlayerContext';
 import { AudioControls } from '@/components/Audio-Player/AudioControls';
@@ -23,7 +24,9 @@ interface PlayerPageClientProps {
 
 
 const PlayerPageClient = ({ book }: PlayerPageClientProps) => {
-    const { currentTrack,setCurrentTrack } = useAudioPlayerContext();
+
+    const { fontSizeState } = useFontSize();
+    const { setCurrentTrack } = useAudioPlayerContext();
     const isPremiumUser = useSelector(selectIsPremiumTier);
     const isSubscriptionLoading = useSelector((state: RootState) => state.subscription.loading);
     const isAuthLoading = useSelector((state: RootState) => state.auth.loading);
@@ -56,7 +59,7 @@ const PlayerPageClient = ({ book }: PlayerPageClientProps) => {
     }, [book, isSubscriptionLoading, isPremiumUser]);
 
     // Gatekeeper displays if user is not logged in, guest, or does not have premium subscription
-    if (!currentTrack) {
+    if (userMustUpgradePlan || isGuest || !user) {
         return (
             <>
                 <Gatekeeper 
@@ -80,7 +83,7 @@ const PlayerPageClient = ({ book }: PlayerPageClientProps) => {
                 </div>}
 
                 <div className={styles["ebook__summary--title"]}>{book.title}</div>
-                <div className={styles["ebook__summary--text"]}>
+                <div className={styles["ebook__summary--text"]} style={{fontSize:`${fontSizeState}px`}}>
                     {book.summary}
                 </div>
             </div>

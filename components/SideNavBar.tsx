@@ -1,5 +1,6 @@
 
 import "@/app/globals.css"
+import React from "react";
 import { usePathname, useRouter } from "next/navigation"; 
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { getErrorMessage, logoutUser } from "@/services/authService";
@@ -7,6 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/lib/redux/store";
 import { useAuthModal } from "@/context/AuthModalContext";
 import { addToast } from "@/lib/redux/toastSlice";
+import { useFontSize } from "@/context/FontSizeContext";
 
 import { AiOutlineHome } from "react-icons/ai";
 import { RiBallPenLine } from "react-icons/ri";
@@ -28,7 +30,12 @@ interface SideNavBarProp {
 
 
 
-function SideNavBar({ showSideBar, showLogoutConfirmation, setShowLogoutConfirmation, closeSideBar }: SideNavBarProp) {
+function SideNavBar({ showSideBar, 
+  showLogoutConfirmation, 
+  setShowLogoutConfirmation, 
+  closeSideBar, 
+}: SideNavBarProp) {
+
   const pathName = usePathname();
   const width = useWindowWidth();
   const router = useRouter();
@@ -36,6 +43,7 @@ function SideNavBar({ showSideBar, showLogoutConfirmation, setShowLogoutConfirma
   const dispatch = useDispatch<AppDispatch>();
   const {setShowModal} = useAuthModal();
   const isPlayerPage: boolean = pathName ? pathName.includes("/player") : false;
+  const { fontSizeState, setFontSize } = useFontSize();
 
   const handleRouting = (route: string) => {
     closeSideBar();
@@ -161,6 +169,64 @@ function SideNavBar({ showSideBar, showLogoutConfirmation, setShowLogoutConfirma
             </div>
             <div className='sideBar__link--text'>Search</div>
           </div>
+
+          {isPlayerPage && (
+            <div className="summary__selections--wrapper">
+
+              <div 
+                className="summary__option--wrapper" 
+                onClick={() => setFontSize(16)}
+              >
+                <div className="option__text" style={{fontSize: 16}} >Aa</div>
+                <div 
+                  className={`
+                    option__highlight 
+                    ${fontSizeState === 16 ? "option__highlight--active" : ""}
+                  `}
+                ></div>
+              </div>
+
+              <div 
+                className="summary__option--wrapper" 
+                onClick={() => setFontSize(18)} 
+              >
+                <div className="option__text" style={{fontSize: 18}} >Aa</div>
+                <div 
+                  className={`
+                    option__highlight 
+                    ${fontSizeState === 18 ? "option__highlight--active" : ""}
+                  `}
+                ></div>
+              </div>
+
+              <div 
+                className="summary__option--wrapper" 
+                onClick={() => setFontSize(22)}
+              >
+                <div className="option__text" style={{fontSize: 22}} >Aa</div>
+                <div 
+                  className={`
+                    option__highlight 
+                    ${fontSizeState === 22 ? "option__highlight--active" : ""}
+                  `}
+                ></div>
+              </div>
+
+              <div 
+                className="summary__option--wrapper" 
+                onClick={() => setFontSize(26)} 
+              >
+                <div className="option__text" style={{fontSize: 26}} >Aa</div>
+                <div 
+                  className={`
+                    option__highlight 
+                    ${fontSizeState === 26 ? "option__highlight--active" : ""}
+                  `}
+                ></div>
+              </div>
+
+            </div>
+          )}
 
         </div>
 
