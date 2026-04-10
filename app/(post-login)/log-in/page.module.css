@@ -31,7 +31,7 @@
     height: 100%;
   }
 
-  .login__text {
+  .login__title {
     font-size: 28px;
     text-align: center;
     margin-bottom: 24px;
@@ -54,6 +54,11 @@
 
   .login__btn:active {
     transform: translateY(1px);
+  }
+
+  .login__create--link {
+    margin-top: 16px;
+    cursor: pointer;
   }
 
   .login__loading-animation {

@@ -10,7 +10,7 @@ import { setUser, clearUser } from "@/lib/redux/userAuthSlice";
 import { setBooks, clearBooks } from "@/lib/redux/librarySlice";
 import { setSubscription, clearSubscription } from "@/lib/redux/subscriptionSlice";
 import { subscribeToLibrary } from "@/services/libraryService";
-import { subscribeToSubscription } from "@/services/subscriptionService";
+import { ensureSubscriptionExists, subscribeToSubscription } from "@/services/subscriptionService";
 import { setAuthCookie, removeAuthCookie } from "@/lib/actions/auth-actions";
 import { SerializableUser } from "@/types/serializableUser";
 
@@ -42,17 +42,24 @@ const AuthListener = () => {
                     photoURL: user.photoURL,
                     isAnonymous: user.isAnonymous,
                 }
-                // dispatch(setUser(user));
                 dispatch(setUser(serializableUser));
+
+                // guests are not permitted to have db record
+                if (!user.isAnonymous) {
+                    ensureSubscriptionExists(user.uid);
+
+                    // Real-time Subscription
+                    unsubs.push(subscribeToSubscription(user.uid, (tier) => {
+                        dispatch(setSubscription(tier));
+                    }));
+                    
+                } else {
+                    dispatch(setSubscription("free"));
+                }
 
                 // Real-time Library
                 unsubs.push(subscribeToLibrary(user.uid, (books) => {
                     dispatch(setBooks(books));
-                }));
-
-                // Real-time Subscription
-                unsubs.push(subscribeToSubscription(user.uid, (tier) => {
-                    dispatch(setSubscription(tier));
                 }));
 
             } else {

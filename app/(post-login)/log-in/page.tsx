@@ -49,7 +49,7 @@ const LoginPage = () => {
                     <LoginSVG />
                 </figure>
 
-                <div className={styles["login__text"]}>
+                <div className={styles["login__title"]}>
                     Log in to enjoy more Summarist
                 </div>
 
@@ -59,6 +59,10 @@ const LoginPage = () => {
                 >
                     Log in
                 </button>
+
+                <div className={styles["login__create--link"]} onClick={() => setShowModal(true)}>
+                    or Sign up
+                </div>
 
             </div>
         </div>

@@ -737,6 +737,12 @@ button:disabled {
   z-index: 110;
 }
 
+@media (max-width: 768px) {
+    .player__shell {
+      height: 180px;
+    }
+}
+
 
 
 /*  Description Text Size /player/[id]  */

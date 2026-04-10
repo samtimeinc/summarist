@@ -244,7 +244,7 @@ const Login = () => {
                         disabled={toggleDisabled}
                         className={styles["btn__modal--switch"]} 
                         onClick={() => setAuthMode("create")} >
-                            Don't have an account?
+                            Sign up for a new account
                         </button>
                     )}
                 </div>

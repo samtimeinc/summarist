@@ -23,8 +23,6 @@ interface GatekeeperProp {
 
 const Gatekeeper = ({ id, isGuest, isSubscriptionLoading, isAuthLoading }: GatekeeperProp) => {
   const isRegisteredUser = id && !isGuest;
-
-
   const router = useRouter();
   const { openModalWithRedirect } = useAuthModal();
   const dispatch = useDispatch();
@@ -43,46 +41,49 @@ const Gatekeeper = ({ id, isGuest, isSubscriptionLoading, isAuthLoading }: Gatek
     }
   };
 
+  // if (isSubscriptionLoading || isAuthLoading) {
+  //   return (
+  //     <div className={styles["container"]}>
+  //     <div className={styles["row"]}>
+  //       <div className={styles["gatekeeper__title"]}>
+  //         <Skeleton height="33px"width="400px" />
+  //       </div>
+  //       <div className={styles["gatekeeper__options--wrapper"]}>
+  //         <Skeleton width="400px" height="420px" />
+  //       </div>
+  //     </div>
+  //   </div>
+  //   )
+  // }
+
   return (
-    <>
+
     <div className={styles["container"]}>
       <div className={styles["row"]}>
-        <div className={styles["gatekeeper__title"]}>
-          {isSubscriptionLoading || isAuthLoading ? (
-            <Skeleton height="33px"width="400px" />
-          ) : (
-            isRegisteredUser ? "Great books are waiting" : "Sign up today and go Premium!"
-          )}
+        <div className={styles["gatekeeper__headline"]}>
+          Great books are waiting. Sign up today and go Premium!
         </div>
         <div className={styles["gatekeeper__options--wrapper"]}>
-
-          {/* User is logged in as guest or somehow finds this page without first logging in.*/}
-          {isSubscriptionLoading || isAuthLoading ? (
-            <Skeleton width="400px" height="420px" />
-          ) : (
-            !isRegisteredUser &&  
-              (<div className={styles["gatekeeper__create--wrapper"]} onClick={() => handleCreateAccount()} >
-                <figure className={styles["options__image--wrapper"]}>
-                  <CreateAccountSVG />
-                </figure>
-                <div className={styles["options__title"]}>Create an account</div>
-              </div>)
-          )}
-
-          {/* User is logged in but not a guest. User is not a premium subscriber */}
-
-          {isRegisteredUser && 
+          <div className={styles["gatekeeper__create--wrapper"]} onClick={() => handleCreateAccount()} >
+            <figure className={styles["options__image--wrapper"]}>
+              <CreateAccountSVG />
+            </figure>
+            <div className={styles["options__intro"]}>Forget guest accounts</div>
+            <div className={styles["options__title"]}>Sign up for Summarist</div>
+          </div>
+          
             <div className={styles["gatekeeper__tier--wrapper"]} onClick={() => router.push("/settings")} >
               <figure className={styles["options__image--wrapper"]}>
                 <ChoosePlanSVG />
               </figure>
+              <div className={styles["options__intro"]}>Access all of Summarist</div>
               <div className={styles["options__title"]}>Upgrade to Premium</div>
             </div>
-          }
+          
         </div>
       </div>
     </div>
-    </>
+
   )
 }
 

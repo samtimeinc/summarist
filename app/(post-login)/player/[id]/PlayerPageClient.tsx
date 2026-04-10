@@ -58,7 +58,7 @@ const PlayerPageClient = ({ book }: PlayerPageClientProps) => {
 
     }, [book, isSubscriptionLoading, isPremiumUser]);
 
-    // Gatekeeper displays if user is not logged in, guest, or does not have premium subscription
+    // Gatekeeper displays if user is not logged in, is guest, or does not have premium subscription
     if (userMustUpgradePlan || isGuest || !user) {
         return (
             <>
