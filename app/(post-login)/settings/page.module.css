@@ -12,3 +12,33 @@
     margin: 0 auto;
     padding: 0 24px;
   }
+
+  .settings__title {
+    font-size: 32px;
+    font-weight: bold;
+    padding: 16px 0;
+  }
+
+  .settings__content {
+    padding: 24px 0;
+  }
+
+  .settings__subtitle {
+    font-size: 20px;
+    font-weight: 600;
+    padding-bottom: 8px;
+  }
+
+  .settings__text {
+    padding-bottom: 16px;
+    
+  }
+
+  .display__tier {
+    text-transform: capitalize;
+  }
+
+  .row > div:nth-child(-n+2) {
+    border-bottom: 1px solid #bac8ce;
+  }
+  
