@@ -378,14 +378,13 @@ const Login = () => {
             </>
         )
     }
-    
 
     useEffect(() => {
         if (user) {
             setShowModal(false);
             if (intendedRoute) {
                 if (subscriptionRequired && tier !== "premium") {
-                    router.push("/settings")
+                    router.push("/choose-plan")
                 } else {
                     router.push(intendedRoute);
                 }

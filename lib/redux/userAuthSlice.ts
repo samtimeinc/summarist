@@ -4,11 +4,13 @@ import { SerializableUser } from '@/types/serializableUser';
 export interface AuthState {
   user: SerializableUser | null;
   loading: boolean;
+  authIsReady: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
   loading: true,
+  authIsReady: false,
 }
 
 export const userAuthSlice = createSlice({
@@ -18,10 +20,12 @@ export const userAuthSlice = createSlice({
     setUser: (state, action: PayloadAction<SerializableUser | null>) => {
         state.user = action.payload;
         state.loading = false;
+        state.authIsReady = true;
     },
     clearUser: (state) => {
       state.user = null;
       state.loading = false;
+      state.authIsReady = true;
     },
   },
 })

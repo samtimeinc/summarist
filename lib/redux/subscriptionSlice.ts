@@ -23,7 +23,7 @@ interface SubscriptionState {
 }
 
 const initialState: SubscriptionState = {
-  tier: "free",
+  tier: "basic",
   loading: true,
   error: null,
 };
@@ -37,7 +37,7 @@ const subscriptionSlice = createSlice({
       state.loading = false;
     },
     clearSubscription: (state) => {
-      state.tier = "free";
+      state.tier = "basic";
     },
   },
   extraReducers: (builder) => {
@@ -51,7 +51,7 @@ const subscriptionSlice = createSlice({
       })
       .addCase(getSubscription.rejected, (state) => {
         state.loading = false;
-        state.tier = "free";
+        state.tier = "basic";
       });
   },
 });

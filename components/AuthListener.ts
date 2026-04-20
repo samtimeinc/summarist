@@ -10,7 +10,7 @@ import { setUser, clearUser } from "@/lib/redux/userAuthSlice";
 import { setBooks, clearBooks } from "@/lib/redux/librarySlice";
 import { setSubscription, clearSubscription } from "@/lib/redux/subscriptionSlice";
 import { subscribeToLibrary } from "@/services/libraryService";
-import { ensureSubscriptionExists, subscribeToSubscription } from "@/services/subscriptionService";
+import { subscribeToSubscription } from "@/services/subscriptionService";
 import { setAuthCookie, removeAuthCookie } from "@/lib/actions/auth-actions";
 import { SerializableUser } from "@/types/serializableUser";
 
@@ -46,7 +46,6 @@ const AuthListener = () => {
 
                 // guests are not permitted to have db record
                 if (!user.isAnonymous) {
-                    ensureSubscriptionExists(user.uid);
 
                     // Real-time Subscription
                     unsubs.push(subscribeToSubscription(user.uid, (tier) => {
@@ -54,7 +53,7 @@ const AuthListener = () => {
                     }));
                     
                 } else {
-                    dispatch(setSubscription("free"));
+                    dispatch(setSubscription("basic"));
                 }
 
                 // Real-time Library

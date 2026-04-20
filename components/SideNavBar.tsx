@@ -106,8 +106,8 @@ function SideNavBar({ showSideBar,
   const handleLogout = async () => {
     try {
       closeSideBar();
-      await logoutUser();
       router.push('/for-you');
+      await logoutUser();
       dispatch(addToast({ 
         title: "Signed out", 
         message: "You have logged out successfully.", 

@@ -7,8 +7,9 @@ import { Book } from '@/types/book';
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
 import { selectIsPremiumTier } from "@/lib/redux/subscriptionSlice";
-import Gatekeeper from "@/components/Gatekeeper";
+import LoginToAccount from "@/components/GatekeeperLogin";
 import { useFontSize } from "@/context/FontSizeContext";
+import UpgradePlan from "@/components/GatekeeperUpgradePlan";
 
 import { useAudioPlayerContext } from '@/context/AudioPlayerContext';
 import { AudioControls } from '@/components/Audio-Player/AudioControls';
@@ -30,16 +31,16 @@ const PlayerPageClient = ({ book }: PlayerPageClientProps) => {
     const isPremiumUser = useSelector(selectIsPremiumTier);
     const isSubscriptionLoading = useSelector((state: RootState) => state.subscription.loading);
     const isAuthLoading = useSelector((state: RootState) => state.auth.loading);
-    const id = useSelector((state: RootState) => state.auth.user?.uid);
     const user = useSelector((state: RootState) => state.auth.user);
-    const isGuest = useSelector((state: RootState) => state.auth.user?.isAnonymous);
-    const userMustUpgradePlan = book.subscriptionRequired && !isPremiumUser;
+    const isPremiumContent = book.subscriptionRequired;
 
     useEffect(() => {
-        if (isSubscriptionLoading || 
-            userMustUpgradePlan || 
-            isGuest || 
-            !user) {
+        if (
+            isSubscriptionLoading || 
+            isAuthLoading || 
+            (isPremiumContent && !isPremiumUser) || 
+            !user
+        ) {
             return;
         }
 
@@ -48,7 +49,8 @@ const PlayerPageClient = ({ book }: PlayerPageClientProps) => {
             author: book.author,
             src: book.audioLink,
             image: book.imageLink,
-        } 
+        }; 
+
         setCurrentTrack(trackData);
 
         // Cleanup: Wipes the context clean when leaving the route
@@ -58,16 +60,19 @@ const PlayerPageClient = ({ book }: PlayerPageClientProps) => {
 
     }, [book, isSubscriptionLoading, isPremiumUser]);
 
-    // Gatekeeper displays if user is not logged in, is guest, or does not have premium subscription
-    if (userMustUpgradePlan || isGuest || !user) {
+    if (!user) {
         return (
             <>
-                <Gatekeeper 
-                    id={id} 
-                    isGuest={isGuest} 
-                    isSubscriptionLoading={isSubscriptionLoading} 
-                    isAuthLoading={isAuthLoading} 
-                />
+                <LoginToAccount />
+                <div className="player__shell"></div>
+            </>
+        )
+    }
+
+    if (isPremiumContent && !isPremiumUser) {
+        return (
+            <>
+                <UpgradePlan />
                 <div className="player__shell"></div>
             </>
         )

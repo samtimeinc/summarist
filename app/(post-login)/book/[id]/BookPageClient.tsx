@@ -56,7 +56,7 @@ const BookPageClient = ({ book }: BookPageClientProps) => {
     }
 
     const handleAddToLibrary = async () => {
-        // if no user is logged in, immediately exit code block an present user with the Login
+        // if no user is logged in, immediately exit code block and present user with Login
         if (!checkUserLogIn()) {
             return;
         }

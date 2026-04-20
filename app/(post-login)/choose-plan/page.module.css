@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+.container {
+    font-family: "Roboto", sans-serif;
+    padding: 40px 0;
+    width: 100%;
+  }
+  
+  .row {
+    max-width: 1070px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .choose__container {
+    display: flex;
+  }
+
+  .choose__options--wrapper {
+    width: 100%;
+  }
+
+  .choose__options--wrapper {
+    padding: 16px 32px;
+  }
+
+  .choose__options--title {
+    padding: 16px 0;
+    border-bottom: 1px solid #bac8ce;
+    margin-bottom: 16px;
+    font-size: 32px;
+  }
+
+  .choose__option {
+    padding: 16px 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .choose__details {
+    line-height: 1.5;
+  }
+
+  .choose__title {
+    font-size: 18px;
+  }
+
+  .choose__price {
+    font-size: 14px;
+  }
+
+  .choose__btn,
+  .current__plan {
+    font-family: "Roboto";
+    font-size: 18px;
+    padding: 8px 40px;
+    border-radius: 4px;
+    transition: all 250ms ease-in-out;
+}
+
+  .choose__btn {
+    background-color: #2bd97c;
+  }
+
+  .choose__btn:hover {
+    background-color: #20ba68;
+  }
+
+  .choose__btn:active {
+    transform: translateY(1px);
+  }
+
+  .current__plan {
+    font-size: 24px;
+    cursor: default;
+  }
+
+
+
+  @media (max-width: 1080px) {
+    .choose__container {
+        flex-direction: column-reverse;
+    }
+
+    .choose__options--wrapper {
+        width: 100%;
+    }
+  }

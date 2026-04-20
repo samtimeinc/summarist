@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 .container {
-    font-family: "Roboto";
+    font-family: "Roboto", sans-serif;
     padding: 40px 0;
     width: 100%;
   }
@@ -26,51 +26,58 @@
     justify-content: space-around;
   }
 
-  .gatekeeper__login--wrapper,
-  .gatekeeper__tier--wrapper, 
-  .gatekeeper__create--wrapper {
-    padding: 16px;
-    border: 2px solid lightgray;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
-    transition: all 200ms ease-in-out;
-  }
-
-  .gatekeeper__login--wrapper:hover,
-  .gatekeeper__tier--wrapper:hover,
-  .gatekeeper__create--wrapper:hover {
-    scale: 1.02;
-  }
-  .gatekeeper__login--wrapper:active,
-  .gatekeeper__tier--wrapper:active,
-  .gatekeeper__create--wrapper:active {
-    transform: translateY(6px);
-  }
-
-  .options__image--wrapper {
-    width: 300px;
+  .option__image--wrapper {
+    width: 360px;
     height: auto;
     display: flex;
     margin: 0 auto;
   }
 
-  .options__image--wrapper svg {
+  .option__image--wrapper svg {
     width: 100%;
     height: 100%;
     margin-bottom: 16px;
   }
 
-  .options__intro {
+  .option__intro {
     text-align: center;
     font-size: 14px;
-    padding-bottom: 8px;
+    padding: 16px 0 4px 0;
   }
 
-  .options__title {
+  .option__title {
     text-align: center;
     font-size: 22px;
     font-weight: 500;
+    padding-bottom: 32px;
+  }
+
+  .option__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+  }
+
+  .option__button--wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .option__button {
+    padding: 12px 40px;
+    min-width: 136px;
+    color: #032b41;
+    background-color: #2bd97c;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 500;
+    transition: all 250ms ease-in-out;
+  }
+
+  .option__button:hover {
+    background-color: #20ba68;
   }
 
 

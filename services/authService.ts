@@ -1,3 +1,4 @@
+
 import { auth } from "@/lib/firebase/firebase";
 import {
     signInWithPopup,
@@ -6,9 +7,10 @@ import {
     createUserWithEmailAndPassword,
     signInAnonymously,
     signOut,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    setPersistence,
+    browserLocalPersistence, 
   } from "firebase/auth";
-  import { setPersistence, browserLocalPersistence } from "firebase/auth";
 
   export const initializeAuthPersistence = async (): Promise<void> => {
     await setPersistence(auth, browserLocalPersistence);

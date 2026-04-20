@@ -1,11 +1,11 @@
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/lib/redux/store";
+import { RootState, AppDispatch } from "@/lib/redux/store";
 import { useAuthModal } from "@/context/AuthModalContext";
 import { addToast } from "@/lib/redux/toastSlice";
 
 export const useCheckUser = () => {
     const user = useSelector((state: RootState) => state.auth.user);
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const { openModalWithRedirect, setShowModal } = useAuthModal();
 
     const checkUserLogIn = (intendedRoute?: string, requireSub: boolean = false): boolean => {
