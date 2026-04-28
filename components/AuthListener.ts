@@ -48,12 +48,12 @@ const AuthListener = () => {
                 if (!user.isAnonymous) {
 
                     // Real-time Subscription
-                    unsubs.push(subscribeToSubscription(user.uid, (tier) => {
-                        dispatch(setSubscription(tier));
+                    unsubs.push(subscribeToSubscription(user.uid, (subscription) => {
+                        dispatch(setSubscription(subscription));
                     }));
                     
                 } else {
-                    dispatch(setSubscription("basic"));
+                    dispatch(setSubscription({ tier: "basic", expires: null }));
                 }
 
                 // Real-time Library

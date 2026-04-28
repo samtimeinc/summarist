@@ -42,10 +42,7 @@ const SettingsPage = () => {
             </div>
             <div className={styles["settings__button--wrapper"]}>
               <button 
-                className={`
-                  ${styles["settings_button"]} 
-                  ${tier === "basic" ? styles["green-button"] : styles["gray-button"]}
-                `}
+                className={styles["settings_button"]} 
                 onClick={() => router.push("/choose-plan")}
               >
                 Manage Plan
@@ -57,6 +54,14 @@ const SettingsPage = () => {
             <div className={styles["settings__info"]}>
               <div className={styles["settings__subtitle"]}>Email</div>
               <div className={styles["settings__text"]}>{isGuest ? "Guest" : user?.email}</div>
+            </div>
+            <div className={styles["settings__button--wrapper"]}>
+              <button 
+                className={styles["settings_button"]} 
+                onClick={() => console.log("Update Email")}
+              >
+                Update Email
+              </button>
             </div>
           </div>
           

@@ -54,8 +54,7 @@
 
   .option__buttons {
     display: flex;
-    justify-content: center;
-    gap: 32px;
+    justify-content: space-between;
   }
 
   .option__button--wrapper {
@@ -66,7 +65,9 @@
   }
 
   .option__button {
-    padding: 12px 40px;
+    display: flex;
+    justify-content: center;
+    padding: 12px 30px;
     min-width: 136px;
     color: #032b41;
     background-color: #2bd97c;
@@ -78,6 +79,10 @@
 
   .option__button:hover {
     background-color: #20ba68;
+  }
+
+  .options__button--plan {
+    font-size: 18px;
   }
 
 

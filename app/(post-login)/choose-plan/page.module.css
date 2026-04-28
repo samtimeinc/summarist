@@ -32,6 +32,10 @@
     font-size: 32px;
   }
 
+  .choose__user--detail {
+    text-transform: capitalize;
+  }
+
   .choose__option {
     padding: 16px 0;
     display: flex;
@@ -44,24 +48,22 @@
 
   .choose__title {
     font-size: 18px;
+    text-transform: capitalize;
   }
 
   .choose__price {
     font-size: 14px;
   }
 
-  .choose__btn,
-  .current__plan {
+  .choose__btn {
+    min-width: 135px;
     font-family: "Roboto";
     font-size: 18px;
     padding: 8px 40px;
     border-radius: 4px;
+    background-color: #2bd97c;
     transition: all 250ms ease-in-out;
 }
-
-  .choose__btn {
-    background-color: #2bd97c;
-  }
 
   .choose__btn:hover {
     background-color: #20ba68;
@@ -71,9 +73,16 @@
     transform: translateY(1px);
   }
 
-  .current__plan {
-    font-size: 24px;
-    cursor: default;
+  .choose__payment {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+  }
+
+  .choose__divider {
+    fill: "";
+    border-bottom: 1px solid #bac8ce;
+    margin: 16px 0;
   }
 
 
@@ -85,5 +94,11 @@
 
     .choose__options--wrapper {
         width: 100%;
+    }
+  }
+
+  @media (max-width: 580px) {
+    .choose__options--wrapper {
+      padding: 16px 0;
     }
   }

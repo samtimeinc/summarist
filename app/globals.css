@@ -127,10 +127,12 @@ button:disabled {
 .loading-message,
 .loading-3Quarters {
   display: flex;
+  font-size: 18px;
 }
 
 .loading-content {
   align-items: center;
+  justify-content: center;
   gap: 10px;
 }
 

@@ -1,10 +1,15 @@
 "use client"
 
 import styles from "./page.module.css"
+import { useEffect } from "react";
 import { useAudioPlayerContext } from "@/context/AudioPlayerContext";
 import { Book } from "@/types/book";
 import BookDuration from "@/components/BookDuration";
 import Link from 'next/link';
+import { useSearchParams } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/lib/redux/store";
+import { addToast } from "@/lib/redux/toastSlice";
 import Carousel from '@/components/Carousel';
 import CarouselSkeleton from '@/components/CarouselSkeleton';
 
@@ -24,7 +29,24 @@ const ForYouPageClient = ({
     suggestedBooks
 }: ForYouPageClientProps ) => {
     const { formatTime } = useAudioPlayerContext();
+    const searchParams = useSearchParams();
+    const sessionId = searchParams.get("session_id");
+    const dispatch = useDispatch<AppDispatch>();
 
+    
+    
+    useEffect(() => {
+      if (sessionId) {
+        dispatch(addToast({
+          title: "Success!", 
+          message: "You have access to all premium content", 
+          type: "success",
+        }));
+      }
+    }, [sessionId, dispatch]);
+
+
+    
     return (
       <div className={styles["row"]}>
         <div className={styles["container"]}>

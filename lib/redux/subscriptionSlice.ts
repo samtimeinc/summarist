@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { fetchUserSubscription } from "@/services/subscriptionService";
-import { subscriptionTier } from "@/types/subscription";
+import { Subscription, subscriptionTier } from "@/types/subscription";
 
-export const getSubscription = createAsyncThunk(
+export const getSubscription = createAsyncThunk<Subscription, string>(
   "subscription/fetchUserSubscription",
   async (userId: string, { rejectWithValue }) => {
     try {
-      const tier = await fetchUserSubscription(userId);
-      return tier;
+      const data = await fetchUserSubscription(userId);
+      return data;
     } catch (error: any) {
       return rejectWithValue(
         error.message || "Failed to find your subscription",
@@ -18,12 +18,14 @@ export const getSubscription = createAsyncThunk(
 
 interface SubscriptionState {
   tier: subscriptionTier;
+  expires: number | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: SubscriptionState = {
   tier: "basic",
+  expires: null,
   loading: true,
   error: null,
 };
@@ -32,12 +34,16 @@ const subscriptionSlice = createSlice({
   name: "subscription",
   initialState,
   reducers: {
-    setSubscription: (state, action: PayloadAction<subscriptionTier>) => {
-      state.tier = action.payload;
+    setSubscription: (state, action: PayloadAction<{ tier: subscriptionTier; expires: number | null}>) => {
+      state.tier = action.payload.tier;
+      state.expires = action.payload.expires;
       state.loading = false;
+      state.error = null;
     },
     clearSubscription: (state) => {
       state.tier = "basic";
+      state.expires = null;
+      state.loading = false;
     },
   },
   extraReducers: (builder) => {
@@ -47,11 +53,14 @@ const subscriptionSlice = createSlice({
       })
       .addCase(getSubscription.fulfilled, (state, action) => {
         state.loading = false;
-        state.tier = action.payload;
+        state.tier = action.payload.tier;
+        state.expires = action.payload.expires;
       })
-      .addCase(getSubscription.rejected, (state) => {
+      .addCase(getSubscription.rejected, (state, action) => {
         state.loading = false;
         state.tier = "basic";
+        state.expires = null;
+        state.error = action.payload as string;
       });
   },
 });
@@ -59,7 +68,8 @@ const subscriptionSlice = createSlice({
 export const { setSubscription, clearSubscription } = subscriptionSlice.actions;
 
 export const selectIsPremiumTier = (state: { subscription: SubscriptionState}) => {
-    return state.subscription.tier === "premium";
+  const tier = state.subscription.tier;
+    return tier === "premium" || tier === "premium-plus";
 }
 
 export default subscriptionSlice.reducer;

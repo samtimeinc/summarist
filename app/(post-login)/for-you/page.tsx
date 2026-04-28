@@ -19,7 +19,6 @@ export default async function ForYouPage() {
   let recommendedBooks: Book[] = [];
   let suggestedBooks: Book[] = [];
 
-
   try {
     const [selBook, recBooks, suggBooks] = await Promise.all(promises);
     selectedBook = selBook.data[0];

@@ -55,24 +55,13 @@
     font-size: 18px;
     padding: 14px 32px;
     border-radius: 4px;
+    color: #032b41;
+    background-color: #2bd97c;
     transition: all 250ms ease-in-out;
   }
 
-  .green-button {
-    color: #032b41;
-    background-color: #2bd97c;
-  }
-
-  .green-button:hover {
+  .settings__button:hover {
     background-color: #20ba68;
-  }
-
-  .gray-button {
-    background-color: #e4e4e4;
-  }
-
-  .gray-button:hover {
-    background-color: #d4d4d4;
   }
 
   .settings_button:active {

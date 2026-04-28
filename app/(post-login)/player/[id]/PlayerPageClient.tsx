@@ -60,7 +60,7 @@ const PlayerPageClient = ({ book }: PlayerPageClientProps) => {
 
     }, [book, isSubscriptionLoading, isPremiumUser]);
 
-    if (!user) {
+    if (!user && !isAuthLoading) {
         return (
             <>
                 <LoginToAccount />

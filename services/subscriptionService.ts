@@ -1,12 +1,12 @@
 import { db } from "@/lib/firebase/firebase";
-import { doc, getDoc, onSnapshot, setDoc, collection, query, where, limit, getDocs } from "firebase/firestore";
+import { onSnapshot, collection, query, where, limit, getDocs } from "firebase/firestore";
 import { Subscription, subscriptionTier } from "@/types/subscription";
 import { STRIPE_PRICES } from "@/lib/constants/stripe";
 
 
 
 
-export const fetchUserSubscription = async (userId: string): Promise<subscriptionTier> => {
+export const fetchUserSubscription = async (userId: string): Promise<Subscription> => {
     try {
         const q = query(
             collection(db, "customers", userId, "subscriptions"),
@@ -19,19 +19,20 @@ export const fetchUserSubscription = async (userId: string): Promise<subscriptio
         if (!querySnapshot.empty) {
             const data = querySnapshot.docs[0].data();
             const priceId = data.items[0].price.id;
+            const expires = data.current_period_end?.seconds || data.current_period_end || null;
 
             if (priceId === STRIPE_PRICES.YEARLY) {
-                return "premium-plus";
+                return { tier: "premium-plus", expires };
             }
 
             if (priceId === STRIPE_PRICES.MONTHLY) {
-                return "premium";
+                return { tier: "premium", expires };
             }
         }
-        return "basic";
+        return { tier: "basic", expires: null };
     } catch (error) {
         console.error("Error fetching subscription: ", error);
-        return "basic";
+        return { tier: "basic", expires: null };
     }
 };
 
@@ -53,7 +54,7 @@ export const setUserSubscription = async (
 
 export const subscribeToSubscription = (
     userId: string, 
-    onUpdate: (tier: subscriptionTier) => void
+    onUpdate: (data: { tier: subscriptionTier, expires: number | null }) => void
 ) => {
     const subscriptionRef = collection(db, "customers", userId, "subscriptions");
 
@@ -65,19 +66,25 @@ export const subscribeToSubscription = (
 
     return onSnapshot(q, (snapshot) => {
         if (snapshot.empty) {
-            onUpdate("basic");
+            onUpdate({ tier: "basic", expires: null });
             return;
         }
 
-        const subscriptionData = snapshot.docs[0].data();
-        const priceId = subscriptionData.items[0].price.id;
+        const data = snapshot.docs[0].data();
+        const priceId = data.items[0].price.id;
+        const expires = data.current_period_end?.seconds || data.current_period_end;
+        let tier: subscriptionTier = "basic";
 
         if (priceId === STRIPE_PRICES.YEARLY) {
-            onUpdate("premium-plus");
+            // onUpdate("premium-plus");
+            tier = "premium-plus";
         } else if (priceId === STRIPE_PRICES.MONTHLY) {
-            onUpdate("premium");
-        } else {
-            onUpdate("basic");
+            // onUpdate("premium");
+            tier = "premium"
+        // } else {
+        //     // onUpdate("basic");
+        //     t
         }
+        onUpdate({ tier, expires });
     });
 };
