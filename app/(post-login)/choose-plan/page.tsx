@@ -13,7 +13,10 @@ const ChoosePlanPage = () => {
     const user = useSelector((state: RootState) => state.auth.user);
     const tier = useSelector((state: RootState) => state.subscription.tier);
     const expires = useSelector((state: RootState) => state.subscription.expires);
+    const cancelRenew = useSelector((state: RootState) => state.subscription.cancelRenew);
     const { startCheckout, redirectToCustomerPortal, isLoading } = useStripeCheckout();
+
+    console.log(cancelRenew)
 
     const formatRenewalDate = (timestamp: number | null) => {
         if (!timestamp) {
@@ -42,11 +45,11 @@ const ChoosePlanPage = () => {
         console.log("Cancel Plan");
         if (tier !== "basic" && user) {
             const confirmCancel = window.confirm(
-                `Cancel ${tier} plan? This will take you to your billing dashboard.`
+                `Cancel ${tier} plan? This will take you to Stripe billing dashboard.`
             );
 
             if (confirmCancel) {
-                redirectToCustomerPortal(user.uid);
+                redirectToCustomerPortal();
             }
         }
     }
@@ -70,8 +73,11 @@ const ChoosePlanPage = () => {
                             <div className={styles["choose__user--detail"]}>
 
                                 {
-                                    (tier !== "basic" && expires) && 
-                                        `Renews ${formatRenewalDate(expires)}`
+                                    (tier !== "basic" && expires) && (
+                                        (cancelRenew ?? false) 
+                                            ? `Expires ${formatRenewalDate(expires)}` 
+                                            : `Renews ${formatRenewalDate(expires)}`
+                                    )
                                 }
                                 
                             </div>
@@ -84,14 +90,14 @@ const ChoosePlanPage = () => {
                         <div className={styles["choose__details"]}>
                             <div className={styles["choose__title"]}>
 
-                                {tier === "basic" ? 
+                                {(tier === "basic" || cancelRenew) ? 
                                         "Upgrade to Premium" : 
                                         `Cancel ${tier} plan`
                                 }
                             </div>
                             <div className={styles["choose__price"]}>
 
-                                {tier === "basic" ? 
+                                {(tier === "basic" || cancelRenew) ? 
                                     displayPremiumPrice() : 
                                     "Return to Basic plan"
                                 }
@@ -101,12 +107,12 @@ const ChoosePlanPage = () => {
                             className={styles["choose__btn"]}
                             disabled={isLoading}
                             onClick={
-                                tier === "basic" ? 
+                                (tier === "basic" || cancelRenew) ? 
                                     () => handleCheckout("MONTHLY") : 
                                     () => handleCancelPlan()
                             }
                         >
-                            {tier === "basic" ? 
+                            {(tier === "basic" || cancelRenew) ? 
                                 displaySelect() : 
                                 "Cancel"
                             }

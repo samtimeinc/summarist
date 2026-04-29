@@ -4,8 +4,9 @@ import { RootState, AppDispatch } from "@/lib/redux/store";
 import { addToast } from "@/lib/redux/toastSlice";
 import { createCheckoutSession } from "@/services/stripeServices";
 import { STRIPE_PRICES, StripePriceKey } from "@/lib/constants/stripe";
-import { db } from "@/lib/firebase/firebase";
+import { db, functions } from "@/lib/firebase/firebase";
 import { collection, addDoc, onSnapshot } from "firebase/firestore";
+import { httpsCallable } from 'firebase/functions';
 
 
 
@@ -45,28 +46,27 @@ export const useStripeCheckout = () => {
         }
     };
 
-    const redirectToCustomerPortal = async (userId: string) => {
+    const redirectToCustomerPortal = async () => {
         setIsLoading(true);
+        
         try {
-            const portalSessionRef = await addDoc(
-                collection(db, "customers", userId, "portal_sessions"),
-                {
-                    return_url: window.location.origin + "settings",
-                }
+            const createPortalLink = httpsCallable<{ returnUrl: string }, { url: string }>(
+                functions,
+                "ext-firestore-stripe-payments-createPortalLink"
             );
-
-            onSnapshot(portalSessionRef, (snap) => {
-                const data = snap.data();
-                if (data?.url) {
-                    window.location.assign(data.url);
-                }
-                if (data?.error) {
-                    console.error("Portal error: ", data.error.message);
-                    setIsLoading(false);
-                }
+            const { data } = await createPortalLink({
+                returnUrl: window.location.origin + "/settings",
             });
-        } catch (error) {
-            console.error("Error creating portal session: ", error);
+
+            window.location.assign(data.url);
+        } catch (error: any) {
+            console.error("Portal Error: ", error);
+            dispatch(addToast({
+                title: "Error",
+                message: "Could not open billing portal. Please try again.",
+                type: "error",
+            }))
+        } finally {
             setIsLoading(false);
         }
     };

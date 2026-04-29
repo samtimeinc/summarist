@@ -19,6 +19,7 @@ export const getSubscription = createAsyncThunk<Subscription, string>(
 interface SubscriptionState {
   tier: subscriptionTier;
   expires: number | null;
+  cancelRenew: boolean;
   loading: boolean;
   error: string | null;
 }
@@ -26,6 +27,7 @@ interface SubscriptionState {
 const initialState: SubscriptionState = {
   tier: "basic",
   expires: null,
+  cancelRenew: false,
   loading: true,
   error: null,
 };
@@ -34,15 +36,17 @@ const subscriptionSlice = createSlice({
   name: "subscription",
   initialState,
   reducers: {
-    setSubscription: (state, action: PayloadAction<{ tier: subscriptionTier; expires: number | null}>) => {
+    setSubscription: (state, action: PayloadAction<{ tier: subscriptionTier; expires: number | null; cancelRenew: boolean }>) => {
       state.tier = action.payload.tier;
       state.expires = action.payload.expires;
+      state.cancelRenew = action.payload.cancelRenew;
       state.loading = false;
       state.error = null;
     },
     clearSubscription: (state) => {
       state.tier = "basic";
       state.expires = null;
+      state.cancelRenew = false;
       state.loading = false;
     },
   },
@@ -55,11 +59,13 @@ const subscriptionSlice = createSlice({
         state.loading = false;
         state.tier = action.payload.tier;
         state.expires = action.payload.expires;
+        state.cancelRenew = action.payload.cancelRenew ?? false;
       })
       .addCase(getSubscription.rejected, (state, action) => {
         state.loading = false;
         state.tier = "basic";
         state.expires = null;
+        state.cancelRenew = false;
         state.error = action.payload as string;
       });
   },

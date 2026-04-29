@@ -20,19 +20,20 @@ export const fetchUserSubscription = async (userId: string): Promise<Subscriptio
             const data = querySnapshot.docs[0].data();
             const priceId = data.items[0].price.id;
             const expires = data.current_period_end?.seconds || data.current_period_end || null;
+            const cancelRenew = !!data.cancel_at_period_end;
 
             if (priceId === STRIPE_PRICES.YEARLY) {
-                return { tier: "premium-plus", expires };
+                return { tier: "premium-plus", expires, cancelRenew };
             }
 
             if (priceId === STRIPE_PRICES.MONTHLY) {
-                return { tier: "premium", expires };
+                return { tier: "premium", expires, cancelRenew };
             }
         }
-        return { tier: "basic", expires: null };
+        return { tier: "basic", expires: null, cancelRenew: false };
     } catch (error) {
         console.error("Error fetching subscription: ", error);
-        return { tier: "basic", expires: null };
+        return { tier: "basic", expires: null, cancelRenew: false };
     }
 };
 
@@ -54,7 +55,7 @@ export const setUserSubscription = async (
 
 export const subscribeToSubscription = (
     userId: string, 
-    onUpdate: (data: { tier: subscriptionTier, expires: number | null }) => void
+    onUpdate: (data: { tier: subscriptionTier, expires: number | null, cancelRenew: boolean }) => void
 ) => {
     const subscriptionRef = collection(db, "customers", userId, "subscriptions");
 
@@ -66,25 +67,22 @@ export const subscribeToSubscription = (
 
     return onSnapshot(q, (snapshot) => {
         if (snapshot.empty) {
-            onUpdate({ tier: "basic", expires: null });
+            onUpdate({ tier: "basic", expires: null, cancelRenew: false });
             return;
         }
 
         const data = snapshot.docs[0].data();
         const priceId = data.items[0].price.id;
         const expires = data.current_period_end?.seconds || data.current_period_end;
+        const cancelRenew = !!data.cancel_at_period_end;
+
         let tier: subscriptionTier = "basic";
 
         if (priceId === STRIPE_PRICES.YEARLY) {
-            // onUpdate("premium-plus");
             tier = "premium-plus";
         } else if (priceId === STRIPE_PRICES.MONTHLY) {
-            // onUpdate("premium");
             tier = "premium"
-        // } else {
-        //     // onUpdate("basic");
-        //     t
         }
-        onUpdate({ tier, expires });
+        onUpdate({ tier, expires, cancelRenew });
     });
 };

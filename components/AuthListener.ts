@@ -53,7 +53,11 @@ const AuthListener = () => {
                     }));
                     
                 } else {
-                    dispatch(setSubscription({ tier: "basic", expires: null }));
+                    dispatch(setSubscription({ 
+                        tier: "basic", 
+                        expires: null, 
+                        cancelRenew: false, 
+                    }));
                 }
 
                 // Real-time Library
