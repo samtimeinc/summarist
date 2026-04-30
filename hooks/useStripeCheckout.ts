@@ -4,9 +4,9 @@ import { RootState, AppDispatch } from "@/lib/redux/store";
 import { addToast } from "@/lib/redux/toastSlice";
 import { createCheckoutSession } from "@/services/stripeServices";
 import { STRIPE_PRICES, StripePriceKey } from "@/lib/constants/stripe";
-import { db, functions } from "@/lib/firebase/firebase";
-import { collection, addDoc, onSnapshot } from "firebase/firestore";
+import { functions } from "@/lib/firebase/firebase";
 import { httpsCallable } from 'firebase/functions';
+import { checkSubscriptionHistory } from "@/services/subscriptionService";
 
 
 
@@ -34,7 +34,11 @@ export const useStripeCheckout = () => {
             if (!priceId) {
                 throw new Error("Invalid Price ID configuration. Check .env file");
             }
-            await createCheckoutSession(user.uid, priceId);
+            const hasSubscribedBefore = await checkSubscriptionHistory(user.uid);
+            const trialDays = (
+                planKey === "YEARLY" && !hasSubscribedBefore) ? 
+                    7 : undefined;
+            await createCheckoutSession(user.uid, priceId, trialDays);
         } catch (error: any) {
             dispatch(addToast({
                 title: "Payment Error",

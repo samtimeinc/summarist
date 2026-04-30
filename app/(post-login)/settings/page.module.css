@@ -35,11 +35,6 @@
     padding-bottom: 8px;
   }
 
-  .settings__text {
-    padding-bottom: 16px;
-    
-  }
-
   .display__tier {
     text-transform: capitalize;
   }
@@ -50,7 +45,8 @@
     justify-content: center;
   }
 
-  .settings_button {
+  .settings__button {
+    min-width: 170px;
     font-family: "Roboto";
     font-size: 18px;
     padding: 14px 32px;

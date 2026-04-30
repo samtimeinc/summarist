@@ -86,3 +86,14 @@ export const subscribeToSubscription = (
         onUpdate({ tier, expires, cancelRenew });
     });
 };
+
+
+
+export const checkSubscriptionHistory = async (userId: string): Promise<boolean> => {
+    const subscriptionRef = collection(db, "customers", userId, "subscriptions");
+
+    const q = query(subscriptionRef, limit(1));
+    const querySnapshot = await getDocs(q);
+
+    return !querySnapshot.empty;
+}
