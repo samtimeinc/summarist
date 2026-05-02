@@ -4,7 +4,6 @@
 import styles from "@/styles/gatekeeper.module.css"
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from "@/lib/redux/store"
-import { useRouter } from 'next/navigation'
 import { useAuthModal } from '@/context/AuthModalContext'
 import { logoutUser } from '@/services/authService'
 import { addToast } from '@/lib/redux/toastSlice'

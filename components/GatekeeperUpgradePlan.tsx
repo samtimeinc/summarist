@@ -4,13 +4,34 @@ import styles from "@/styles/gatekeeper.module.css"
 import { useState } from "react"
 import { useStripeCheckout } from "@/hooks/useStripeCheckout"
 import LoadingAnimation from "./LoadingAnimation"
+import { useSelector } from "react-redux"
+import { RootState } from "@/lib/redux/store"
 
 import ChoosePlanSVG from "./ChoosePlanSVG"
+import { StripePriceKey } from "@/lib/constants/stripe"
 
 const UpgradePlan = () => {
   const [loadingMode, setLoadingMode] = useState<string>("");
 
-  const { startCheckout } = useStripeCheckout();
+  const { startCheckout, redirectToCustomerPortal } = useStripeCheckout();
+  const tier = useSelector((state: RootState) => state.subscription.tier);
+
+  const handleCheckout = (planKey: StripePriceKey, loadingKey: string) => {
+    setLoadingMode(loadingKey)
+    if (tier !== "basic") {
+        const confirmManage = window.confirm(
+            "You are a current subscriber. Manage your plan on Stripe"
+        );
+        if (confirmManage) {
+          redirectToCustomerPortal();
+          setLoadingMode("");
+        }
+        setLoadingMode("");
+        return;
+    }
+    startCheckout(planKey);
+    setLoadingMode("");
+};
 
   
 
@@ -35,17 +56,15 @@ const UpgradePlan = () => {
               <button 
                 className={styles["option__button"]} 
                 disabled={!!loadingMode} 
-                onClick={() => {
-                  setLoadingMode("premium"),
-                  startCheckout("MONTHLY");
-                }}
+                onClick={() => handleCheckout("MONTHLY", "premium")}
               >
-                {loadingMode === "premium" ? 
-                  <LoadingAnimation 
-                    fontSize={24} 
-                    color="#032b41" 
-                  /> : 
-                  "Select"
+                {
+                  loadingMode === "premium" ? 
+                    <LoadingAnimation 
+                      fontSize={24} 
+                      color="#032b41" 
+                    /> : 
+                    "Select"
                 }
               </button>
             </div>
@@ -56,17 +75,15 @@ const UpgradePlan = () => {
               <button 
                 className={styles["option__button"]} 
                 disabled={!!loadingMode}
-                onClick={() => {
-                  setLoadingMode("premium-plus");
-                  startCheckout("YEARLY");
-                }}
+                onClick={() => handleCheckout("YEARLY", "premium-plus")}
               >
-                {loadingMode === "premium-plus" ? 
-                  <LoadingAnimation 
-                    fontSize={24} 
-                    color="#032b41" 
-                  /> : 
-                  "Select"
+                {
+                  loadingMode === "premium-plus" ? 
+                    <LoadingAnimation 
+                      fontSize={24} 
+                      color="#032b41" 
+                    /> : 
+                    "Select"
                 }
               </button>
             </div>

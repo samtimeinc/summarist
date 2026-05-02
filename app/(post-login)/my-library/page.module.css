@@ -1,0 +1,25 @@
+.row {
+    max-width: 1070px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .container {
+    padding: 40px 0;
+    width: 100%;
+  }
+
+  .library__title,
+  .library__subtitle {
+    margin-bottom: 16px;
+  }
+
+  .library__subtitle {
+    font-size: 18px;
+  }
+
+  .library__books--wrapper {
+    min-height: 397px;
+    margin-bottom: 32px;
+  }

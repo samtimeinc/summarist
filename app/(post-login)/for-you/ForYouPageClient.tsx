@@ -10,7 +10,7 @@ import { useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/lib/redux/store";
 import { addToast } from "@/lib/redux/toastSlice";
-import Carousel from '@/components/Carousel';
+import EmblaCarousel from '@/components/Carousel';
 import CarouselSkeleton from '@/components/CarouselSkeleton';
 
 import { FaCirclePlay } from "react-icons/fa6";
@@ -93,7 +93,7 @@ const ForYouPageClient = ({
             <div className={styles["forYou-subtitle"]}>We think you'll like these</div>
             <div className={styles["recommended__books"]}>
                 {recommendedBooks.length > 0 ? (
-                  <Carousel data={recommendedBooks} />
+                  <EmblaCarousel data={recommendedBooks} />
                 ) : (
                   <CarouselSkeleton marginBottom="76px" />
                 )}
@@ -103,7 +103,7 @@ const ForYouPageClient = ({
             <div className={styles["forYou-subtitle"]}>Browse these books</div>
             <div className={styles["suggested__books"]}>
                 {suggestedBooks.length > 0 ? (
-                  <Carousel data={suggestedBooks} />
+                  <EmblaCarousel data={suggestedBooks} />
                 ) : (
                   <CarouselSkeleton />
                 )}

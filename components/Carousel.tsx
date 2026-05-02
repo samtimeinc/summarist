@@ -1,4 +1,5 @@
 
+
 import "@/app/globals.css"
 import useEmblaCarousel from 'embla-carousel-react'
 import { Book } from '@/types/book';
@@ -13,7 +14,7 @@ interface CarouselProp {
     data: Book[];
 }
 
-const EmblaCarousel = ({data}: CarouselProp) => {
+const EmblaCarousel = ({ data }: CarouselProp) => {
     const [emblaRef, emblaApi] = useEmblaCarousel({loop: true, align: 'start'});
 
     const { formatTime } = useAudioPlayerContext();
@@ -43,6 +44,7 @@ const EmblaCarousel = ({data}: CarouselProp) => {
                                             <CiClock2 className='carousel__book--icon' />
                                             <span className="carousel__book--text">
                                                 <BookDuration 
+                                                    bookId={book.id}
                                                     audioSrc={book.audioLink} 
                                                     formatTime={formatTime} 
                                                 />

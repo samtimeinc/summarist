@@ -6,7 +6,7 @@ interface CarouselSkeletonProp {
     marginBottom?: string;
 }
 
-const CarouselSkeleton = ({marginBottom}: CarouselSkeletonProp) => {
+const CarouselSkeleton = ({ marginBottom }: CarouselSkeletonProp) => {
 
   return (
     <div className="embla__skeleton--container">

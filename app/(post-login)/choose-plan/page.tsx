@@ -1,9 +1,8 @@
 "use client"
 
 import styles from "./page.module.css"
-import { RootState, AppDispatch } from '@/lib/redux/store'
-import { useSelector, useDispatch } from 'react-redux'
-import { addToast } from "@/lib/redux/toastSlice"
+import { RootState } from '@/lib/redux/store'
+import { useSelector } from 'react-redux'
 import { useStripeCheckout } from "@/hooks/useStripeCheckout"
 import { StripePriceKey } from "@/lib/constants/stripe"
 import LoadingAnimation from "@/components/LoadingAnimation"
@@ -17,7 +16,6 @@ const ChoosePlanPage = () => {
     const expires = useSelector((state: RootState) => state.subscription.expires);
     const cancelRenew = useSelector((state: RootState) => state.subscription.cancelRenew);
     const isTierLoading = useSelector((state: RootState) => state.subscription.loading);
-    const dispatch = useDispatch<AppDispatch>();
     const { startCheckout, redirectToCustomerPortal, isLoading } = useStripeCheckout();
 
     console.log(cancelRenew)
@@ -46,7 +44,6 @@ const ChoosePlanPage = () => {
     }
 
     const handleCancelPlan = () => {
-        console.log("Cancel Plan");
         if (tier !== "basic" && user) {
             const confirmCancel = window.confirm(
                 `Cancel ${tier} plan? This will take you to Stripe billing dashboard.`
@@ -55,11 +52,10 @@ const ChoosePlanPage = () => {
             if (confirmCancel) {
                 redirectToCustomerPortal();
             }
-        }
-    }
+        };
+    };
 
     const handleCheckout = (planKey: StripePriceKey) => {
-        console.log(`Stripe checkout ${planKey} initiated`);
         if (tier !== "basic") {
             const confirmManage = window.confirm(
                 "You are a current subscriber. Manage your plan on Stripe"
@@ -70,7 +66,7 @@ const ChoosePlanPage = () => {
             return;
         }
         startCheckout(planKey);
-    }
+    };
 
   return (
     <div className={styles["container"]}>
@@ -186,12 +182,13 @@ const ChoosePlanPage = () => {
                     </div>
 
                     <div className={styles["choose__payment"]}>
-                        {isLoading && 
-                            <LoadingAnimation 
-                                message="Connecting to Stripe..." 
-                                fontSize={48} 
-                                color="#032b41" 
-                            />
+                        {
+                            isLoading && 
+                                <LoadingAnimation 
+                                    message="Connecting to Stripe..." 
+                                    fontSize={48} 
+                                    color="#032b41" 
+                                />
                         }
                     </div>
                 </div>

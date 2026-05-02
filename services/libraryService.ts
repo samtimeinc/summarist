@@ -13,14 +13,14 @@ import { Book } from "@/types/book";
 // Fetch all saved books for a given user
 export const fetchUserLibrary = async (userId: string): Promise<Book[]> => {
     try {
-        const docRef = doc(db, "libraries", userId);
+        const docRef = doc(db, "libraries", userId, "saved_books", "list");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             return docSnap.data().books ?? [];
         }
         return [];
     } catch (error) {
-        console.error("Error fetching library:", error);
+        console.error("Error fetching user library:", error);
         return[];
     }
 };
@@ -39,25 +39,39 @@ const sanitizeBook = (book: Book): Partial<Book> => {
 // Add a book to the user's library
 export const saveBookToLibrary = async (userId: string, book: Book): Promise<void> => {
     try {
-        const docRef = doc(db, "libraries", userId);
+        const docRef = doc(db, "libraries", userId, "saved_books", "list");
         const sanitized = sanitizeBook(book);
         await setDoc(docRef, { books: arrayUnion(sanitized) }, { merge: true });
     } catch (error) {
-        console.error("Error saving book: ", error);
+        console.error("Error saving book to saved books: ", error);
         throw error;
     }
 };
 
 
 
+// Add a book that user has completely to list of finished books
+export const saveBookToFinished = async (userId: string, book: Book): Promise<void> => {
+    try {
+        const docRef = doc(db, "libraries", userId, "finished_books", "list");
+        const sanitized = sanitizeBook(book);
+        await setDoc(docRef, { books: arrayUnion(sanitized) }, {merge: true});
+    } catch (error) {
+        console.error("Error saving book to finished books: ", error);
+        throw error;
+    }
+}
+
+
+
 // Remove a book from the user's library
 export const removeBookFromLibrary = async (userId: string, book: Book): Promise<void> => {
     try {
-        const docRef = doc(db, "libraries", userId);
+        const docRef = doc(db, "libraries", userId, "saved_books", "list");
         const sanitized = sanitizeBook(book)
  ;       await setDoc(docRef, { books: arrayRemove(sanitized) }, { merge: true });
     } catch (error) {
-        console.error("Error removing book: ", error);
+        console.error("Error removing book from saved books: ", error);
         throw error;
     }
 };
@@ -65,7 +79,7 @@ export const removeBookFromLibrary = async (userId: string, book: Book): Promise
 
 
 export const subscribeToLibrary = (userId: string, onUpdate: (books: Book[]) => void) => {
-    const docRef = doc(db, "libraries", userId);
+    const docRef = doc(db, "libraries", userId, "saved_books", "list");
 
     return onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
