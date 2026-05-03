@@ -7,9 +7,9 @@ import { auth } from "@/lib/firebase/firebase";
 import { onIdTokenChanged } from "firebase/auth";
 import { initializeAuthPersistence } from "@/services/authService";
 import { setUser, clearUser } from "@/lib/redux/userAuthSlice";
-import { setBooks, clearBooks } from "@/lib/redux/librarySlice";
+import { setSavedBooks, setFinishedBooks, clearBooks } from "@/lib/redux/librarySlice";
 import { setSubscription, clearSubscription } from "@/lib/redux/subscriptionSlice";
-import { subscribeToLibrary } from "@/services/libraryService";
+import { subscribeToSavedLibrary, subscribeToFinishedLibrary } from "@/services/libraryService";
 import { subscribeToSubscription } from "@/services/subscriptionService";
 import { setAuthCookie, removeAuthCookie } from "@/lib/actions/auth-actions";
 import { SerializableUser } from "@/types/serializableUser";
@@ -60,10 +60,15 @@ const AuthListener = () => {
                     }));
                 }
 
-                // Real-time Library
-                unsubs.push(subscribeToLibrary(user.uid, (books) => {
-                    dispatch(setBooks(books));
+                // Real-time saved books Library
+                unsubs.push(subscribeToSavedLibrary(user.uid, (books) => {
+                    dispatch(setSavedBooks(books));
                 }));
+
+                // Real-time finished books library
+                unsubs.push(subscribeToFinishedLibrary(user.uid, (books) => {
+                    dispatch(setFinishedBooks(books));
+                }))
 
             } else {
                 await removeAuthCookie();

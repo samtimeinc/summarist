@@ -57,7 +57,7 @@ export const AudioControls = () => {
 
     return (
         <div className={styles["audio__controls--wrapper"]}>
-            <audio src={currentTrack?.src} ref={audioRef} onLoadedMetadata={onLoadedMetaData} />
+            <audio src={currentTrack?.audioLink} ref={audioRef} onLoadedMetadata={onLoadedMetaData} />
           
             <div className={styles["audio__controls"]}>
                 <button className={styles["audio__controls--btn"]} onClick={skipBackward} >

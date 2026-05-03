@@ -2,7 +2,6 @@
 
 import styles from "./page.module.css"
 import { useEffect } from 'react'
-import { AudioBook } from "@/types/audiobook";
 import { Book } from '@/types/book';
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
@@ -44,14 +43,7 @@ const PlayerPageClient = ({ book }: PlayerPageClientProps) => {
             return;
         }
 
-        const trackData: AudioBook = {
-            title: book.title,
-            author: book.author,
-            src: book.audioLink,
-            image: book.imageLink,
-        }; 
-
-        setCurrentTrack(trackData);
+        setCurrentTrack(book);
 
         // Cleanup: Wipes the context clean when leaving the route
         return () => {

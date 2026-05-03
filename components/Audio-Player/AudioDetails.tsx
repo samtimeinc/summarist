@@ -17,9 +17,9 @@ export const AudioDetails = () => {
             <figure className={styles["audio__track--image-mask"]}>
                 {currentTrack ? (
                     <figure className={styles["book__image--wrapper"]}>
-                        {currentTrack?.image ? (
+                        {currentTrack?.imageLink ? (
                             <img 
-                                src={currentTrack?.image} 
+                                src={currentTrack?.imageLink} 
                                 alt={currentTrack?.title} 
                                 className={styles['book__image']} /> 
                         ) : (

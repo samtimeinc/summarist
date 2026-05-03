@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 import { useCheckUser } from "@/hooks/useCheckUser"
 import { useCheckSubscription } from "@/hooks/useCheckSubscription"
 import { saveBookToLibrary, removeBookFromLibrary } from "@/services/libraryService"
-import { addBook, removeBook } from "@/lib/redux/librarySlice"
+import { addSavedBook, removeSavedBook } from "@/lib/redux/librarySlice"
 import { addToast } from "@/lib/redux/toastSlice"
 import { useAudioPlayerContext } from "@/context/AudioPlayerContext"
 import BookDuration from "@/components/BookDuration"
@@ -30,7 +30,7 @@ interface BookPageClientProps {
 
 const BookPageClient = ({ book }: BookPageClientProps) => {
     const user = useSelector((state: RootState) => state.auth.user);
-    const library = useSelector((state: RootState) => state.library.books);
+    const library = useSelector((state: RootState) => state.library.savedBooks);
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
 
@@ -67,7 +67,7 @@ const BookPageClient = ({ book }: BookPageClientProps) => {
         try {
             if (wasBookSaved) { 
                 // book is already in user's library
-                dispatch(removeBook(book.id));
+                dispatch(removeSavedBook(book.id));
                 await removeBookFromLibrary(user.uid, book);
                 dispatch(
                     addToast(
@@ -80,7 +80,7 @@ const BookPageClient = ({ book }: BookPageClientProps) => {
                 );
             } else { 
                 // book is not currently in user's library
-                dispatch(addBook(book));
+                dispatch(addSavedBook(book));
                 await saveBookToLibrary(user.uid, book);
                 dispatch(
                     addToast(
@@ -96,9 +96,9 @@ const BookPageClient = ({ book }: BookPageClientProps) => {
             console.error(
                 "Library operation failed, changes will be rolled back: ", error);
             if (wasBookSaved) {
-                dispatch(addBook(book));
+                dispatch(addSavedBook(book));
             } else {
-                dispatch(removeBook(book.id));
+                dispatch(removeSavedBook(book.id));
             }
             dispatch(
                 addToast(

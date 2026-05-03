@@ -11,17 +11,26 @@ import { Book } from "@/types/book";
 
 
 // Fetch all saved books for a given user
-export const fetchUserLibrary = async (userId: string): Promise<Book[]> => {
+export const fetchUserLibraries = async (userId: string): Promise<{ saved: Book[], finished: Book[] }> => {
     try {
-        const docRef = doc(db, "libraries", userId, "saved_books", "list");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            return docSnap.data().books ?? [];
+        const savedDocRef = doc(db, "libraries", userId, "saved_books", "list");
+        const finishedDocRef = doc(db, "libraries", userId, "finished_books", "list");
+
+        const [savedDocSnap, finishedDocSnap] = await Promise.all([
+            getDoc(savedDocRef),
+            getDoc(finishedDocRef),
+        ]);
+
+        return {
+            saved: savedDocSnap.data()?.books ?? [],
+            finished: finishedDocSnap.data()?.books ?? [],
         }
-        return [];
     } catch (error) {
         console.error("Error fetching user library:", error);
-        return[];
+        return {
+            saved: [],
+            finished: [],
+        };
     }
 };
 
@@ -53,11 +62,15 @@ export const saveBookToLibrary = async (userId: string, book: Book): Promise<voi
 // Add a book that user has completely to list of finished books
 export const saveBookToFinished = async (userId: string, book: Book): Promise<void> => {
     try {
-        const docRef = doc(db, "libraries", userId, "finished_books", "list");
+        const finishedRef = doc(db, "libraries", userId, "finished_books", "list");
+        const savedRef = doc(db, "libraries", userId, "saved_books", "list");
         const sanitized = sanitizeBook(book);
-        await setDoc(docRef, { books: arrayUnion(sanitized) }, {merge: true});
+        await Promise.all([
+            setDoc(finishedRef, { book: arrayUnion(sanitized) }, { merge: true }),
+            setDoc(savedRef, { book: arrayRemove(sanitized) }, { merge: true }),
+        ]);
     } catch (error) {
-        console.error("Error saving book to finished books: ", error);
+        console.error("Error moving book to finished: ", error);
         throw error;
     }
 }
@@ -78,10 +91,10 @@ export const removeBookFromLibrary = async (userId: string, book: Book): Promise
 
 
 
-export const subscribeToLibrary = (userId: string, onUpdate: (books: Book[]) => void) => {
-    const docRef = doc(db, "libraries", userId, "saved_books", "list");
+export const subscribeToSavedLibrary = (userId: string, onUpdate: (books: Book[]) => void) => {
+    const savedDocRef = doc(db, "libraries", userId, "saved_books", "list");
 
-    return onSnapshot(docRef, (docSnap) => {
+    return onSnapshot(savedDocRef, (docSnap) => {
         if (docSnap.exists()) {
             onUpdate(docSnap.data().books ?? []);
         } else {
@@ -91,3 +104,19 @@ export const subscribeToLibrary = (userId: string, onUpdate: (books: Book[]) => 
         console.error("Library subscription error:", error);
     });
 };
+
+
+
+export const subscribeToFinishedLibrary = (userId: string, onUpdate: (books: Book[]) => void) => {
+    const finishedDocRef = doc(db, "libraries", userId, "finished_books", "list");
+
+    return onSnapshot(finishedDocRef, (docSnap) => {
+        if (docSnap.exists()) {
+            onUpdate(docSnap.data().books ?? []);
+        } else {
+            onUpdate([]);
+        }
+    }, (error) => {
+        console.error("Finished Lib Subscription error: ", error);
+    })
+}

@@ -1,16 +1,15 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { fetchUserLibrary } from "@/services/libraryService";
+import { fetchUserLibraries } from "@/services/libraryService";
 import { Book } from "@/types/book";
 
 
 
 export const getLibrary = createAsyncThunk(
-  "library/fetchUserLibrary",
-  async(userId: string, {rejectWithValue}) => {
+  "library/fetchUserLibraries",
+  async(userId: string, { rejectWithValue }) => {
     try {
-      const books = await fetchUserLibrary(userId);
-      return books;
+      return await fetchUserLibraries(userId);
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch library");
     }
@@ -18,13 +17,15 @@ export const getLibrary = createAsyncThunk(
 )
 
 interface LibraryState {
-  books: Book[];
+  savedBooks: Book[];
+  finishedBooks: Book[];
   loading: boolean;
   error: string | null;
 };
 
 const initialState: LibraryState = {
-  books: [],
+  savedBooks: [],
+  finishedBooks: [],
   loading: false,
   error: null,
 };
@@ -33,20 +34,38 @@ const librarySlice = createSlice({
   name: "library",
   initialState,
   reducers: {
-    setBooks: (state, action: PayloadAction<Book[]>) => {
-      state.books = action.payload;
+    setSavedBooks: (state, action: PayloadAction<Book[]>) => {
+      state.savedBooks = action.payload;
+      state.loading = false;
+      state.error = null;
     },
-    addBook: (state, action: PayloadAction<Book>) => {
-      const exists = state.books.some(book => book.id == action.payload.id);
+    setFinishedBooks: (state, action: PayloadAction<Book[]>) => {
+      state.finishedBooks = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    addSavedBook: (state, action: PayloadAction<Book>) => {
+      const exists = state.savedBooks.some(book => book.id == action.payload.id);
       if (!exists) {
-        state.books.push(action.payload);
+        state.savedBooks.push(action.payload);
       }
     },
-    removeBook: (state, action: PayloadAction<string>) => {
-      state.books = state.books.filter(book => book.id !== action.payload);
+    addFinishedBook: (state, action: PayloadAction<Book>) => {
+      const exists = state.finishedBooks.some(book => book.id == action.payload.id);
+      if (!exists) {
+        state.finishedBooks.push(action.payload);
+      }
+    },
+    removeSavedBook: (state, action: PayloadAction<string>) => {
+      state.savedBooks = state.savedBooks.filter(book => book.id !== action.payload);
+    },
+    removeFinishedBook: (state, action: PayloadAction<string>) => {
+      state.finishedBooks = state.finishedBooks.filter(book => book.id !== action.payload);
     },
     clearBooks: (state) => {
-      state.books = [];
+      state.savedBooks = [];
+      state.finishedBooks = [];
+      state.loading = false;
       state.error = null;
     },
   },
@@ -58,7 +77,8 @@ const librarySlice = createSlice({
       })
       .addCase(getLibrary.fulfilled, (state, action) => {
         state.loading = false;
-        state.books = action.payload;
+        state.savedBooks = action.payload.saved;
+        state.finishedBooks = action.payload.finished;
       })
       .addCase(getLibrary.rejected, (state, action) => {
         state.loading = false;
@@ -67,5 +87,14 @@ const librarySlice = createSlice({
   },
 });
 
-export const {addBook, setBooks, removeBook, clearBooks} = librarySlice.actions;
+export const { 
+  addSavedBook, 
+  addFinishedBook, 
+  setSavedBooks, 
+  setFinishedBooks, 
+  removeSavedBook, 
+  removeFinishedBook, 
+  clearBooks
+} = librarySlice.actions;
+
 export default librarySlice.reducer;
