@@ -26,12 +26,14 @@ const LoginToAccount = () => {
           <div className={styles["option__intro"]}>Have an account?</div>
           <div className={styles["option__title"]}>Log in for more Summarist</div>
           <div className={styles["option__buttons"]}>
-            <button 
-              className={styles["option__button"]} 
-              onClick={() => setShowModal(true)}
-            >
-              Log in
-            </button>
+            <div className={styles["option__single-button--wrapper"]}>
+              <button 
+                className={styles["option__button"]} 
+                onClick={() => setShowModal(true)}
+              >
+                Log in
+              </button>
+            </div>
           </div>
         </div>
       </div>

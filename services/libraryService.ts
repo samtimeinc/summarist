@@ -66,8 +66,8 @@ export const saveBookToFinished = async (userId: string, book: Book): Promise<vo
         const savedRef = doc(db, "libraries", userId, "saved_books", "list");
         const sanitized = sanitizeBook(book);
         await Promise.all([
-            setDoc(finishedRef, { book: arrayUnion(sanitized) }, { merge: true }),
-            setDoc(savedRef, { book: arrayRemove(sanitized) }, { merge: true }),
+            setDoc(finishedRef, { books: arrayUnion(sanitized) }, { merge: true }),
+            setDoc(savedRef, { books: arrayRemove(sanitized) }, { merge: true }),
         ]);
     } catch (error) {
         console.error("Error moving book to finished: ", error);

@@ -2,7 +2,7 @@
 
 import MyLibraryPageClient from './MyLibraryPageClient'
 import { cookies } from 'next/headers'
-import { db, auth } from '@/lib/firebase/firebase-admin' // Server-side Admin SDK
+import { db, auth } from '@/lib/firebase/firebase-admin'
 import LoginToAccount from "@/components/GatekeeperLogin"
 import { Book } from '@/types/book'
 
@@ -22,13 +22,6 @@ const page = async () => {
         // Verify the token with Admin SDK to get the real uid
         const decodedToken = await auth.verifyIdToken(token);
         const uid = decodedToken.uid;
-        
-        // Check if the user is a Guest via the token before querying db
-        if (decodedToken.firebase.sign_in_provider === "anonymous") {
-            return (
-                <LoginToAccount />
-            )
-        }
 
         // Fetch the specific "list" document from the subcollections
         const savedBooksRef = db

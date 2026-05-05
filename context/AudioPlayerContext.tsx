@@ -35,9 +35,13 @@ interface AudioPlayerContextType {
   playAnimationRef: React.MutableRefObject<number | null>;
 }
 
+
+
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(
   undefined,
 );
+
+
 
 const formatTime = (time: number | undefined): string => {
   if (typeof time === "number" && !isNaN(time)) {
@@ -51,6 +55,8 @@ const formatTime = (time: number | undefined): string => {
   }
   return "00:00";
 };
+
+
 
 export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const [currentTrack, setCurrentTrack] = useState<Book | null>(null);
@@ -75,13 +81,20 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+
+
   const updateProgress = useCallback(() => {
 
-    if (audioRef.current && progressRef.current && duration > 0) {
+    if (
+      audioRef.current && 
+      progressRef.current && 
+      duration > 0
+    ) {
       const currrentTime = audioRef.current.currentTime;
       setTimeProgress(currrentTime);
 
       progressRef.current.value = currrentTime.toString();
+
       const currentPercent = Math.floor((currrentTime / duration) * 100);
       progressRef.current.style.setProperty(
         "--range-progress",
@@ -91,16 +104,23 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       if (currentPercent !== lastPercentRef.current) {
         lastPercentRef.current = currentPercent;
 
-        if (currentPercent >= 90 && !hasFinishedCurrentBook.current && user?.uid && currentTrack) {
+        if (
+          currentPercent >= 90 && 
+          !hasFinishedCurrentBook.current && 
+          user?.uid && currentTrack
+        ) {
           hasFinishedCurrentBook.current = true;
-          saveBookToFinished(user.uid, currentTrack).catch((err) => {
+          saveBookToFinished(user.uid, currentTrack)
+          .catch((err) => {
             hasFinishedCurrentBook.current = false;
             console.error("Auto-finish error: ", err);
           });
         }
       }
     }
-  }, [duration, setTimeProgress, audioRef, progressRef, user?.uid, currentTrack]);
+  }, [duration, user?.uid, currentTrack]);
+
+
 
   const updateProgressRef = useRef(updateProgress);
 
@@ -108,15 +128,19 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     updateProgressRef.current = updateProgress;
   }, [updateProgress])
 
+
+
   const startAnimation = useCallback(() => {
-    if (audioRef.current && progressRef.current && duration) {
+    if (audioRef.current && progressRef.current) {
       const animate = () => {
         updateProgressRef.current();
         playAnimationRef.current = requestAnimationFrame(animate);
       };
       playAnimationRef.current = requestAnimationFrame(animate);
     }
-  }, [updateProgress, duration, audioRef, progressRef]);
+  }, []);
+
+
 
   const contextValue = {
     currentTrack,

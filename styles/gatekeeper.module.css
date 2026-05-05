@@ -57,6 +57,10 @@
     justify-content: space-between;
   }
 
+  .option__single-button--wrapper {
+    margin: 0 auto;
+  }
+
   .option__button--wrapper {
     display: flex;
     flex-direction: column;

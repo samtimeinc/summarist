@@ -1,14 +1,22 @@
 'use client'
 
-import styles from "../../app/page.module.css"
+import styles from "../../app/page.module.css";
 
-import React, { useEffect, useState } from 'react'
-import { loginWithGoogle, 
+import React, { 
+    useEffect, 
+    useState, 
+    useCallback, 
+} from 'react';
+import { auth } from "@/lib/firebase/firebase";
+import { EmailAuthProvider, linkWithCredential, } from "firebase/auth";
+import { 
+    loginWithGoogle, 
     loginWithEmail, 
     loginAsGuest, 
     passwordReset, 
     registerWithEmail, 
-    getErrorMessage } from '@/services/authService';
+    getErrorMessage, 
+} from '@/services/authService';
 import LoadingAnimation from '../LoadingAnimation';
 import Skeleton from '../Skeleton';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,18 +24,20 @@ import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useRouter } from 'next/navigation';
 import { useAuthModal } from '@/context/AuthModalContext';
 import { addToast } from "@/lib/redux/toastSlice";
+import { AuthMode } from "@/context/AuthModalContext";
 
 
 import { FaUser } from "react-icons/fa";
 import { IoClose } from 'react-icons/io5';
 
-type AuthMode = "login" | "reset" | "create";
+// export type AuthMode = "login" | "reset" | "create";
 type LoadingMode = "noLoad" | "guest" | "google" | "email" | "pwReset" | "newAccount";
 
 const Login = () => {
-    const [authMode, setAuthMode] = useState<AuthMode>("login");
+    // const [authMode, setAuthMode] = useState<AuthMode>("login");
     const [loadingMode, setLoadingMode] = useState<LoadingMode>("noLoad");
     const [toggleDisabled, setToggleDisabled] = useState<boolean>(false);
+
     const [loginEmail, setLoginEmail] = useState<string>("");
     const [loginPassword, setLoginPassword] = useState<string>("");
     const [pwResetEmail, setPwResetEmail] = useState<string>("");
@@ -35,13 +45,85 @@ const Login = () => {
     const [createPassword, setCreatePassword] = useState<string>("");
 
     const user = useSelector((state: RootState) => state.auth.user);
-    const router = useRouter();
     const tier = useSelector((state: RootState) => state.subscription.tier);
     const dispatch = useDispatch<AppDispatch>();
-    const {setShowModal, intendedRoute, subscriptionRequired} = useAuthModal();
+    const router = useRouter();
+    const { 
+        setShowModal, 
+        intendedRoute, 
+        subscriptionRequired, 
+        authMode,
+        setAuthMode,
+        resetRedirect,
+    } = useAuthModal();
+
+
+
+    // Crentralized Error Handler for Toasts
+    const handleAuthError = useCallback((error: any) => {
+        let message = "An unexpected error occurred.";
+        const errorCode = error?.code;
+
+        switch (errorCode) {
+            case 'auth/invalid-email':
+                message = "That email address is invalid.";
+                break;
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+            case 'auth/invalid-credential':
+                message = "Invalid login credentials.";
+                break;
+            case 'auth/weak-password':
+                message = "Password is too short. Please use at least 6 characters.";
+                break;
+            case 'auth/email-already-in-use':
+                message = "This email is already associated with an account.";
+                break;
+            default:
+                message = error?.message || "Authentication failed.";
+        }
+
+        dispatch(addToast({
+            title: "Authentication Error",
+            message,
+            type: "error",
+        }));
+    }, [dispatch]);
+
+
+
+    // Handle anonymous-to-permanent account
+    useEffect(() => {
+        if (user?.isAnonymous) {
+            setAuthMode("create");
+        }
+    }, [user?.isAnonymous]);
+
+
+
+    // Redirect Logic
+    useEffect(() => {
+        if (user && !user?.isAnonymous && intendedRoute) {
+            setShowModal(false);
+            if (subscriptionRequired && tier === "basic") {
+                router.push("/settings");
+            } else {
+                router.push(intendedRoute);
+            }
+
+            resetRedirect();
+        }
+    }, [
+        user, 
+        intendedRoute, 
+        subscriptionRequired, 
+        tier, 
+        router, 
+        setShowModal,
+        resetRedirect,
+    ]);
 
     
-
 
     /* Show/Hide Modal */
     const handleOverlayClick = () => {
@@ -61,11 +143,11 @@ const Login = () => {
         try {
             await loginAsGuest();
         } catch (error) {
+            handleAuthError(error);
+        } finally {
+            setShowModal(false);
             setLoadingMode("noLoad");
             setToggleDisabled(false);
-            console.error("Log in as guest failed: ", error)
-            const message = getErrorMessage(error) || "Guest login failed.";
-            dispatch(addToast({ title: "Error", message, type: "error"}));
         }
     }
 
@@ -75,11 +157,11 @@ const Login = () => {
         try {
             await loginWithGoogle();
         } catch (error) {
+            handleAuthError(error);
+        } finally {
+            setShowModal(false);
             setLoadingMode("noLoad");
             setToggleDisabled(false);
-            console.error("Login with Google failed: ", error)
-            const message = getErrorMessage(error) || "Login with Google failed.";
-            dispatch(addToast({ title: "Error", message, type: "error"}));
         }
     }
 
@@ -90,13 +172,43 @@ const Login = () => {
         try {
             await loginWithEmail(loginEmail, loginPassword);
         } catch (error) {
+            handleAuthError(error);
+        } finally {
+            setShowModal(false);
             setLoadingMode("noLoad");
             setToggleDisabled(false);
-            console.error("Login with email failed: ", error)
-            const message = getErrorMessage(error) || "Login with email failed.";
-            dispatch(addToast({ title: "Error", message, type: "error"}));
         }
     }
+
+    const handleCreateOrLinkAccount = async (event: React.FormEvent) => {
+        event.preventDefault();
+        setLoadingMode("newAccount");
+        setToggleDisabled(true);
+
+        try {
+            if (user?.isAnonymous) {
+                const credential = EmailAuthProvider.credential(createEmail, createPassword);
+                await linkWithCredential(auth.currentUser!, credential)
+                dispatch(addToast({
+                    title: "Welcome!",
+                    message: "Account linked.",
+                    type: "success",
+                }));
+            } else {
+                await registerWithEmail(createEmail, createPassword);
+                dispatch(addToast({
+                    title: "Welcome!",
+                    message: "Account created.",
+                    type: "success",
+                }));
+            };
+        } catch (error) {
+            handleAuthError(error);
+        } finally {
+            setLoadingMode("noLoad");
+            setToggleDisabled(false);
+        }
+    } 
 
     const handlePasswordReset = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -116,27 +228,6 @@ const Login = () => {
         }
     }
 
-    const handleCreateAccount = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setLoadingMode("newAccount");
-        setToggleDisabled(true);
-        try {
-            await registerWithEmail(createEmail, createPassword);
-            dispatch(addToast({
-                title: "Account created",
-                message: "Welcome to Summarist!",
-                type: "success",
-            }))
-        } catch (error) {
-            setLoadingMode("noLoad");
-            setToggleDisabled(false);
-            console.error("Registration error: ", error)
-            const message = getErrorMessage(error) || "Failed to create account.";
-            dispatch(addToast({ title: "Registration failed", message, type: "error"}));
-        }
-    }
-
-
 
 
     /* Modal Views */
@@ -150,22 +241,22 @@ const Login = () => {
                     </div>
 
                     <button 
-                    type='button' 
-                    disabled={toggleDisabled} 
-                    onClick={handleGuestLogin}
-                    className={`
-                        ${styles["btn"]} 
-                        ${styles["btn__guest--login"]} 
-                        ${loadingMode !== "noLoad" ? `${styles["loading"]}` : ""}`} >
+                        type='button' 
+                        disabled={toggleDisabled || !!user} 
+                        onClick={handleGuestLogin}
+                        className={`
+                            ${styles["btn"]} 
+                            ${styles["btn__guest--login"]} 
+                            ${loadingMode !== "noLoad" ? `${styles["loading"]}` : ""}`} >
 
-                        <figure className={styles["icon__guest"]}>
-                            <FaUser color='#fff' size={24} />
-                        </figure>
-                        <div>
-                            {loadingMode === "guest" ? (
-                                <LoadingAnimation message='Please wait' fontSize={20} color='#fff'/>
-                                ) : ("Log in as guest")}
-                        </div>
+                            <figure className={styles["icon__guest"]}>
+                                <FaUser color='#fff' size={24} />
+                            </figure>
+                            <div>
+                                {loadingMode === "guest" ? (
+                                    <LoadingAnimation message='Please wait' fontSize={20} color='#fff'/>
+                                    ) : ("Log in as guest")}
+                            </div>
                     </button>
 
                     <div className={styles["modal__divider"]}>
@@ -173,22 +264,22 @@ const Login = () => {
                     </div>
 
                     <button 
-                    type='button' 
-                    disabled={toggleDisabled} 
-                    onClick={handleGoogleLogin}
-                    className={`
-                        ${styles["btn"]} 
-                        ${styles["btn__google--login"]} 
-                        ${loadingMode !== "noLoad" ? `${styles["loading"]}` : ""}`} >
+                        type='button' 
+                        disabled={toggleDisabled || !!user} 
+                        onClick={handleGoogleLogin}
+                        className={`
+                            ${styles["btn"]} 
+                            ${styles["btn__google--login"]} 
+                            ${loadingMode !== "noLoad" ? `${styles["loading"]}` : ""}`} >
 
-                        <figure className={styles["icon__google--wrapper"]}>
-                            <img src="/google.png"></img>
-                        </figure>
-                        <div>
-                            {loadingMode === "google" ? (
-                                <LoadingAnimation message='Please wait' fontSize={20} color='#fff' />
-                                ) : ("Log in with Google")}
-                        </div>
+                            <figure className={styles["icon__google--wrapper"]}>
+                                <img src="/google.png"></img>
+                            </figure>
+                            <div>
+                                {loadingMode === "google" ? (
+                                    <LoadingAnimation message='Please wait' fontSize={20} color='#fff' />
+                                    ) : ("Log in with Google")}
+                            </div>
                     </button>
 
                     <div className={styles["modal__divider"]}>
@@ -196,32 +287,40 @@ const Login = () => {
                     </div>
 
                     <form 
-                    onSubmit={handleEmailLogin} 
-                    className={styles["modal__form"]} >
+                        onSubmit={handleEmailLogin} 
+                        className={styles["modal__form"]} 
+                    >
+                        <input 
+                            type='email' 
+                            disabled={toggleDisabled || !!user}
+                            value={loginEmail} 
+                            onChange={(event) => setLoginEmail(event.target.value)}
+                            id='login__email' 
+                            placeholder='Email Address' 
+                        />
 
                         <input 
-                        type='email' 
-                        disabled={toggleDisabled}
-                        value={loginEmail} 
-                        onChange={(event) => setLoginEmail(event.target.value)}
-                        id='login__email' 
-                        placeholder='Email Address' />
-
-                        <input 
-                        type='password' 
-                        disabled={toggleDisabled}
-                        value={loginPassword} 
-                        onChange={(event) => setLoginPassword(event.target.value)}
-                        id='login__password' 
-                        placeholder='Password' />
+                            type='password' 
+                            disabled={toggleDisabled || !!user}
+                            value={loginPassword} 
+                            onChange={(event) => setLoginPassword(event.target.value)}
+                            id='login__password' 
+                            placeholder='Password' 
+                        />
 
                         <button 
-                        type='submit' 
-                        disabled={toggleDisabled} 
-                        className={styles["btn"]} >
-                            {loadingMode === "email" ? (
-                                <LoadingAnimation message='Please wait' fontSize={20} color='#032b41' />
-                            ) : ("Login")}
+                            type='submit' 
+                            disabled={toggleDisabled || !!user} 
+                            className={styles["btn"]} >
+                                {
+                                    loadingMode === "email" ? 
+                                    (
+                                        <LoadingAnimation 
+                                            message='Please wait' 
+                                            fontSize={20} color='#032b41' 
+                                        />
+                                    ) : ("Login")
+                                }
                         </button>
                     </form>
                 </div>
@@ -230,23 +329,28 @@ const Login = () => {
                     <div className={styles["modal__block"]} />
                 ) : (
                     <div 
-                    className={styles["modal__forgotPassword"]} 
-                    onClick={() => setAuthMode("reset")} >
+                        className={styles["modal__forgotPassword"]} 
+                        onClick={() => setAuthMode("reset")} 
+                    >
                         Forgot your password?
                     </div>
                 )}
 
                 <div className={styles["modal__footer"]} >
-                    {toggleDisabled ? (
-                            <Skeleton height="40px" width="398px" borderRadius="0px 0px 8px 8px" message='Logging in' />
-                        ) : (
-                        <button 
-                        disabled={toggleDisabled}
-                        className={styles["btn__modal--switch"]} 
-                        onClick={() => setAuthMode("create")} >
-                            Sign up for a new account
-                        </button>
-                    )}
+                    {
+                        toggleDisabled ? 
+                            (
+                                <Skeleton height="40px" width="398px" borderRadius="0px 0px 8px 8px" message='Logging in' />
+                            ) : (
+                                <button 
+                                    disabled={toggleDisabled}
+                                    className={styles["btn__modal--switch"]} 
+                                    onClick={() => setAuthMode("create")} 
+                                >
+                                    Sign up for a new account
+                                </button>
+                            )
+                    }
                 </div>
             </>
         )
@@ -261,36 +365,42 @@ const Login = () => {
                         Reset your password
                     </div>
 
-                    {loadingMode === "pwReset" ? (
-                        <div style={{height:"96px"}}>
-                            A reset link has been sent to<br />{pwResetEmail}
+                    {
+                        loadingMode === "pwReset" ? (
+                            <div style={{height:"96px"}}>
+                                A reset link has been sent to<br />{pwResetEmail}
 
-                            <button type='button' 
-                            className={`${styles["btn"]} ${styles["btn-showModal-false"]}`} 
-                            onClick={() => setShowModal(false)} >
-                                OK
-                            </button>
-                        </div>
-                    ) : (
-                        <form 
-                        onSubmit={handlePasswordReset}
-                        className={styles["modal__form"]} >
+                                <button 
+                                    type='button' 
+                                    className={`${styles["btn"]} ${styles["btn-showModal-false"]}`} 
+                                    onClick={() => setShowModal(false)} 
+                                >
+                                    OK
+                                </button>
+                            </div>
+                        ) : (
+                            <form 
+                                onSubmit={handlePasswordReset}
+                                className={styles["modal__form"]} >
 
-                            <input 
-                            type='email' 
-                            value={pwResetEmail} 
-                            onChange={(event) => setPwResetEmail(event.target.value)}
-                            id='passwordReset__email' 
-                            placeholder='Email address' />
+                                    <input 
+                                        type='email' 
+                                        value={pwResetEmail} 
+                                        onChange={(event) => setPwResetEmail(event.target.value)}
+                                        id='passwordReset__email' 
+                                        placeholder='Email address' 
+                                    />
 
-                            <button 
-                            type='submit' 
-                            disabled={toggleDisabled} 
-                            className={styles["btn"]} >
-                                Reset password
-                            </button>
-                        </form>
-                    )} 
+                                    <button 
+                                        type='submit' 
+                                        disabled={toggleDisabled} 
+                                        className={styles["btn"]} 
+                                    >
+                                        Reset password
+                                    </button>
+                            </form>
+                    )
+                    } 
                 </div>
 
                 <button 
@@ -308,108 +418,127 @@ const Login = () => {
                 <div className={styles["modal__content"]} >
 
                     <div className={styles["modal__title"]} >
-                        Create an account
+                        {user?.isAnonymous ? "Register this account" : "Create an account"}
                     </div>
 
-                    <button 
-                    type='button' 
-                    disabled={toggleDisabled} 
-                    onClick={handleGoogleLogin}
-                    className={`${styles["btn"]} ${styles["btn__google--login"]}`} >
-                        <figure className={styles["icon__google--wrapper"]} >
-                            <img src="google.png" />
-                        </figure>
-                        <div>
-                            {loadingMode === "google" ? (
-                                <LoadingAnimation message='Please wait' fontSize={20} color='#fff' />
-                                ) : ("Sign up with Google")}
-                        </div>
-                    </button>
+                    {user?.isAnonymous ? "" : 
+                        <>
+                            <button 
+                                type='button' 
+                                disabled={toggleDisabled} 
+                                onClick={handleGoogleLogin}
+                                className={`${styles["btn"]} ${styles["btn__google--login"]}`} 
+                            >
+                                    <figure className={styles["icon__google--wrapper"]} >
+                                        <img src="google.png" />
+                                    </figure>
+                                    <div>
+                                        {
+                                            loadingMode === "google" ? 
+                                            (
+                                                <LoadingAnimation 
+                                                    message='Please wait' 
+                                                    fontSize={20} color='#fff' 
+                                                />
+                                            ) : ("Sign up with Google")}
+                                    </div>
+                            </button>
 
-                    <div className={styles["modal__divider"]} >
-                        <span className={styles["modal__divider--text"]}>or</span>
-                    </div>
+                            <div className={styles["modal__divider"]} >
+                                <span className={styles["modal__divider--text"]}>or</span>
+                            </div>
+                        </>
+                    }
 
                     <form 
-                    onSubmit={handleCreateAccount}
-                    className={styles["modal__form"]} >
+                        onSubmit={handleCreateOrLinkAccount}
+                        className={styles["modal__form"]} >
 
-                        <input 
-                        type='email' 
-                        disabled={toggleDisabled} 
-                        value={createEmail} 
-                        onChange={(event) => setCreateEmail(event.target.value)}
-                        id='createAccount__email' 
-                        placeholder='Email address' />
+                            <input 
+                                type='email' 
+                                disabled={toggleDisabled} 
+                                value={createEmail} 
+                                onChange={(event) => setCreateEmail(event.target.value)}
+                                id='createAccount__email' 
+                                placeholder='Email address' 
+                            />
 
-                        <input 
-                        type='password' 
-                        disabled={toggleDisabled} 
-                        value={createPassword} 
-                        onChange={(event) => setCreatePassword(event.target.value)} 
-                        id='createAccount__password' 
-                        placeholder='Password' />
+                            <input 
+                                type='password' 
+                                disabled={toggleDisabled} 
+                                value={createPassword} 
+                                onChange={(event) => setCreatePassword(event.target.value)} 
+                                id='createAccount__password' 
+                                placeholder='Password' 
+                            />
 
-                        <button 
-                        type='submit' 
-                        disabled={toggleDisabled} 
-                        className={styles["btn"]} >
-                            {loadingMode === "newAccount" ? (
-                                <LoadingAnimation message='Please wait' fontSize={20} color='#032b41' />
-                            ) : (
-                                "Create account"
-                            )}
-                        </button>
+                            <button 
+                                type='submit' 
+                                disabled={toggleDisabled} 
+                                className={styles["btn"]} 
+                            >
+                                {
+                                    loadingMode === "newAccount" ? 
+                                        (
+                                            <LoadingAnimation 
+                                                message='Please wait' 
+                                                fontSize={20} color='#032b41' 
+                                            />
+                                        ) : (
+                                            user?.isAnonymous ? "Sign up" : "Create account"
+                                        )
+                                }
+                            </button>
                     </form>
                 </div>
 
                 <div className={styles["modal__footer"]} >
-                    {toggleDisabled ? (
-                            <Skeleton height="40px" width="398px" borderRadius="0px 0px 8px 8px" />
-                        ) : (
-                        <button 
-                        disabled={toggleDisabled}
-                        className={styles["btn__modal--switch"]} 
-                        onClick={() => setAuthMode("login")} >
-                            Have an account? Go to login
-                        </button>
-                    )}
+                    {
+                        user?.isAnonymous ? "" : 
+                            (
+                                toggleDisabled ? 
+                                    (
+                                        <Skeleton height="40px" width="398px" borderRadius="0px 0px 8px 8px" />
+                                    ) : (
+                                        <button 
+                                            disabled={toggleDisabled}
+                                            className={styles["btn__modal--switch"]} 
+                                            onClick={() => setAuthMode("login")} 
+                                        >
+                                            Have an account? Go to login
+                                        </button>
+                                    )
+                            )
+                    }
                 </div>
             </>
         )
     }
 
-    useEffect(() => {
-        if (user) {
-            setShowModal(false);
-            if (intendedRoute) {
-                if (subscriptionRequired && tier !== "premium") {
-                    router.push("/choose-plan")
-                } else {
-                    router.push(intendedRoute);
-                }
-            }
-        }
-    }, [user]);
-
   return (
     <div 
-    onClick={handleOverlayClick}
-    className={styles["modal__wrapper"]} >
-        
+        onClick={handleOverlayClick}
+        className={styles["modal__wrapper"]} 
+    >
+           
         <div 
-        onClick={handlePopupClick} 
-        className={`${styles["modal__modal"]} `} >
+            onClick={handlePopupClick} 
+            className={`${styles["modal__modal"]} `} 
+        >
 
             {authMode === "login" && renderLoginView()}
             {authMode === "reset" && renderPwResetView()}
             {authMode === "create" && renderCreateView()}
             
-            <div className={styles["modal__hideModal"]} 
-            onClick={() => {
-                    setShowModal(false);
-                    setAuthMode("login");
-                }} >
+            <div 
+                className={styles["modal__hideModal"]} 
+                onClick={() => {
+                        setShowModal(false);
+                        setAuthMode("login");
+                        
+                    }
+                } 
+            >
                 <IoClose />
             </div>
         </div>

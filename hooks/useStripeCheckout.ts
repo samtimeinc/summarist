@@ -23,7 +23,7 @@ export const useStripeCheckout = () => {
         if (!user || isGuest) {
             dispatch(addToast({
                 title: "Account Required",
-                message: "Please sign in to upgrade your account.",
+                message: "Please sign in or register your account.",
                 type: "info",
             }));
             return;

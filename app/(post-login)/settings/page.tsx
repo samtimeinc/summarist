@@ -4,6 +4,7 @@ import styles from "./page.module.css"
 import { useSelector } from 'react-redux'
 import { RootState } from '@/lib/redux/store'
 import { useRouter } from 'next/navigation'
+import { useAuthModal } from "@/context/AuthModalContext"
 import Skeleton from "@/components/Skeleton"
 
 const SettingsPage = () => {
@@ -13,6 +14,7 @@ const SettingsPage = () => {
   const tier = useSelector((state: RootState) => state.subscription.tier);
   const isTierLoading = useSelector((state: RootState) => state.subscription.loading);
   const isGuest = user?.isAnonymous;
+  const { setShowModal }  = useAuthModal();
         
   return (
     <div className={styles["container"]}>
@@ -59,6 +61,20 @@ const SettingsPage = () => {
                     (isGuest ? "Guest" : user?.email)
                 }
                 </div>
+            </div>
+            <div className={styles["settings__button--wrapper"]}>
+              {
+                isTierLoading ? 
+                  <Skeleton width="170px" height="50px" borderRadius="4px" /> : 
+                  (
+                    <button 
+                      className={styles["settings__button"]} 
+                      onClick={() => setShowModal(true)}
+                    >
+                      Register
+                    </button>
+                  )
+              }
             </div>
           </div>
           
