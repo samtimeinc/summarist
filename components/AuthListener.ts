@@ -23,11 +23,13 @@ const AuthListener = () => {
         initializeAuthPersistence();
 
         const authUnsubscribe = onIdTokenChanged(auth, async (user) => {
+
             // If user changes, clean up old listeners
             unsubs.forEach(unsub => unsub());
             unsubs = [];
 
             if (user) {
+
                 // Token management for middleware
                 const token = await user.getIdToken();
                 if (!isMounted) {
@@ -44,7 +46,6 @@ const AuthListener = () => {
                 }
                 dispatch(setUser(serializableUser));
 
-                // guests are not permitted to have db record
                 if (!user.isAnonymous) {
 
                     // Real-time Subscription
@@ -60,12 +61,12 @@ const AuthListener = () => {
                     }));
                 }
 
-                // Real-time saved books Library
+                // Real-time saved books list
                 unsubs.push(subscribeToSavedLibrary(user.uid, (books) => {
                     dispatch(setSavedBooks(books));
                 }));
 
-                // Real-time finished books library
+                // Real-time finished books list
                 unsubs.push(subscribeToFinishedLibrary(user.uid, (books) => {
                     dispatch(setFinishedBooks(books));
                 }))

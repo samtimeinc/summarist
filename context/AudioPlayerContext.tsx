@@ -71,6 +71,8 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const progressRef = useRef<HTMLInputElement>(null);
   const playAnimationRef = useRef<number | null>(null);
 
+
+  
   const onLoadedMetaData = () => {
     if (audioRef.current) {
       const seconds = audioRef.current.duration;
@@ -124,6 +126,8 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const updateProgressRef = useRef(updateProgress);
 
+
+
   useEffect(() => {
     updateProgressRef.current = updateProgress;
   }, [updateProgress])
@@ -175,14 +179,14 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [currentTrack]);
 
-
-
   return (
     <AudioPlayerContext.Provider value={contextValue}>
       {children}
     </AudioPlayerContext.Provider>
   );
 };
+
+
 
 export const useAudioPlayerContext = (): AudioPlayerContextType => {
   const context = useContext(AudioPlayerContext);

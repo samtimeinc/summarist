@@ -57,7 +57,11 @@ export const AudioControls = () => {
 
     return (
         <div className={styles["audio__controls--wrapper"]}>
-            <audio src={currentTrack?.audioLink} ref={audioRef} onLoadedMetadata={onLoadedMetaData} />
+            <audio 
+                src={currentTrack?.audioLink} 
+                ref={audioRef} 
+                onLoadedMetadata={onLoadedMetaData} 
+            />
           
             <div className={styles["audio__controls"]}>
                 <button className={styles["audio__controls--btn"]} onClick={skipBackward} >
@@ -67,11 +71,12 @@ export const AudioControls = () => {
                     className={`
                         ${styles["audio__controls--btn"]} 
                         ${styles["audio__controls--btn-play"]}`} 
-                        onClick={() => setIsAudioPlaying((prev) => !prev)} >
-
+                    onClick={() => setIsAudioPlaying((prev) => !prev)} 
+                >
                     {isAudioPlaying ? 
                         <FaPause /> : 
-                        <FaPlay className={styles["audio__controls--play-icon"]} /> }
+                        <FaPlay className={styles["audio__controls--play-icon"]} /> 
+                    }
                 </button>
                 <button className={styles["audio__controls--btn"]} onClick={skipForward} >
                     <TenSecondFForwardIcon />

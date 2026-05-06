@@ -6,15 +6,21 @@ import { RootState } from '@/lib/redux/store'
 import { useRouter } from 'next/navigation'
 import { useAuthModal } from "@/context/AuthModalContext"
 import Skeleton from "@/components/Skeleton"
+import LoginToAccount from "@/components/GatekeeperLogin"
+
+
 
 const SettingsPage = () => {
-
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
   const tier = useSelector((state: RootState) => state.subscription.tier);
   const isTierLoading = useSelector((state: RootState) => state.subscription.loading);
   const isGuest = user?.isAnonymous;
   const { setShowModal }  = useAuthModal();
+
+  if (!user) {
+    return <LoginToAccount />
+  }
         
   return (
     <div className={styles["container"]}>
@@ -66,14 +72,13 @@ const SettingsPage = () => {
               {
                 isTierLoading ? 
                   <Skeleton width="170px" height="50px" borderRadius="4px" /> : 
-                  (
+                  user?.isAnonymous ? 
                     <button 
                       className={styles["settings__button"]} 
                       onClick={() => setShowModal(true)}
                     >
                       Register
-                    </button>
-                  )
+                    </button> : ""
               }
             </div>
           </div>

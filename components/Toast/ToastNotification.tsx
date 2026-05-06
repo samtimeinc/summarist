@@ -20,7 +20,7 @@ export const ToastContainer = () => {
       >
         {toast.title && <div className={styles["toast__title"]}>{toast.title}</div>}
         <div className={styles["toast__message"]}>{toast.message}</div>
-        {/* Auto-remove after 4 seconds */}
+
         <AutoTimer onExpiry={() => dispatch(removeToast(toast.id))} />
       </div>
     ))}
@@ -28,10 +28,10 @@ export const ToastContainer = () => {
   );
 };
 
-// Simple helper to handle auto-deletion
+// Helper to handle auto-deletion
 const AutoTimer = ({ onExpiry }: { onExpiry: () => void }) => {
   useEffect(() => {
-    const timer = setTimeout(onExpiry, 4000);
+    const timer = setTimeout(onExpiry, 5000);
     return () => clearTimeout(timer);
   }, [onExpiry]);
   return null;

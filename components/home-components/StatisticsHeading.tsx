@@ -8,9 +8,12 @@ interface StatisticsHeadingProp {
 
 const StatisticsHeading = ({ index, activeIndex, heading }: StatisticsHeadingProp) => {
   return (
-    <div className={`
-    ${styles["statistics__heading"]} 
-    ${index === activeIndex ? styles["statistics__heading--active"] : ""}`} >
+    <div className=
+      {`
+        ${styles["statistics__heading"]} 
+        ${index === activeIndex ? styles["statistics__heading--active"] : ""}
+      `} 
+    >
         {heading}
     </div>
   )

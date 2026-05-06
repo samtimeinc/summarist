@@ -1,7 +1,7 @@
 import "@/app/globals.css"
 import Link from "next/link"
 import { Book } from "@/types/book"
-import React, { useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 import Skeleton from "./Skeleton"
 
 import { CiClock2 } from "react-icons/ci";
@@ -54,7 +54,13 @@ const SearchResult = ({ results, loading, activeIndex }: SearchResultProp) => {
             <Link 
                 href={`/book/${result.id}`} 
                 key={result.id}
-                className={`result__link ${index === activeIndex ? "result__link--active" : ""}`} >
+                className={`
+                    result__link 
+                    ${
+                        index === activeIndex ? 
+                            "result__link--active" : ""
+                    }
+                `} >
 
                 <audio src={result.audioLink} />
 

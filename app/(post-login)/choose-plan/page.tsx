@@ -18,8 +18,6 @@ const ChoosePlanPage = () => {
     const isTierLoading = useSelector((state: RootState) => state.subscription.loading);
     const { startCheckout, redirectToCustomerPortal, isLoading } = useStripeCheckout();
 
-    console.log(cancelRenew)
-
     const formatRenewalDate = (timestamp: number | null) => {
         if (!timestamp) {
             return "";
@@ -31,20 +29,10 @@ const ChoosePlanPage = () => {
         });
     };
 
-    const displayPremiumPrice = () => {
-        return "$5/month";
-    }
-
-    const displayPremiumPlusPrice = () => {
-        return "$50/year";
-    }
-
-    const displaySelect = () => {
-        return "Select";
-    }
-
     const handleCancelPlan = () => {
         if (tier !== "basic" && user) {
+            
+            // System window popup requiring user confirmation
             const confirmCancel = window.confirm(
                 `Cancel ${tier} plan? This will take you to Stripe billing dashboard.`
             );
@@ -67,6 +55,19 @@ const ChoosePlanPage = () => {
         }
         startCheckout(planKey);
     };
+
+    // Functions for displaying text based on user scenario
+    const displayPremiumPrice = () => {
+        return "$5/month";
+    }
+
+    const displayPremiumPlusPrice = () => {
+        return "$50/year";
+    }
+
+    const displaySelect = () => {
+        return "Select";
+    }
 
   return (
     <div className={styles["container"]}>

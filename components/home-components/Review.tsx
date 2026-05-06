@@ -10,7 +10,13 @@ interface ReviewProp {
     endParagraph: string;
 }
 
-const Review = ({ name, rating, startParagraph, boldParagraph, endParagraph}: ReviewProp) => {
+const Review = ({ 
+    name, 
+    rating, 
+    startParagraph, 
+    boldParagraph, 
+    endParagraph
+}: ReviewProp) => {
     function displayRating(): React.ReactNode[] {
         return new Array(rating).fill(0).map((_, index) => (
             <React.Fragment key={index} >

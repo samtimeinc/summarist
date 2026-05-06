@@ -23,7 +23,6 @@ const page = async () => {
         const decodedToken = await auth.verifyIdToken(token);
         const uid = decodedToken.uid;
 
-        // Fetch the specific "list" document from the subcollections
         const savedBooksRef = db
             .collection("libraries")
             .doc(uid)
@@ -36,7 +35,6 @@ const page = async () => {
             .collection("finished_books")
             .doc("list");
 
-        // Run both queries in parallel for better performance
         const [savedSnapshot, finishedSnapshot] = await Promise.all([
             savedBooksRef.get(),
             finishedBooksRef.get(),

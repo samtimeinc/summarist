@@ -1,4 +1,7 @@
+
 import "../app/globals.css";
+
+
 
 interface SkeletonProp {
     height: string;

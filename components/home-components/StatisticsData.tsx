@@ -7,7 +7,12 @@ interface StatisticsDataProp {
     endDescription: string
 }
 
-const StatisticsData = ({ percent, startDescription, boldDescription, endDescription }: StatisticsDataProp) => {
+const StatisticsData = ({ 
+  percent, 
+  startDescription, 
+  boldDescription, 
+  endDescription 
+}: StatisticsDataProp) => {
   return (
     <div className={styles["statistics__data"]}>
         <div className={styles["statistics__data--number"]}>

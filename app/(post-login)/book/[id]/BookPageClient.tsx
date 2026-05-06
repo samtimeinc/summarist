@@ -66,7 +66,8 @@ const BookPageClient = ({ book }: BookPageClientProps) => {
         const wasBookSaved = isBookSaved;
         try {
             if (wasBookSaved) { 
-                // book is already in user's library
+                // book is already in library
+                // book to be removed from library
                 dispatch(removeSavedBook(book.id));
                 await removeBookFromLibrary(user.uid, book);
                 dispatch(
@@ -80,6 +81,7 @@ const BookPageClient = ({ book }: BookPageClientProps) => {
                 );
             } else { 
                 // book is not currently in user's library
+                // book to be added to library
                 dispatch(addSavedBook(book));
                 await saveBookToLibrary(user.uid, book);
                 dispatch(

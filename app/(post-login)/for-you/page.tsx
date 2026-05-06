@@ -8,11 +8,14 @@ import { notFound } from "next/navigation";
 export default async function ForYouPage() {
   const promises = [
     axios.get<Book[]>(
-      "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=selected"),
+      "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=selected"
+    ),
     axios.get<Book[]>(
-      "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=recommended"),
+      "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=recommended"
+    ),
     axios.get<Book[]>(
-      "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=suggested"),
+      "https://us-central1-summaristt.cloudfunctions.net/getBooks?status=suggested"
+    ),
   ]
 
   let selectedBook: Book | null = null;
@@ -21,7 +24,7 @@ export default async function ForYouPage() {
 
   try {
     const [selBook, recBooks, suggBooks] = await Promise.all(promises);
-    selectedBook = selBook.data[0];
+    selectedBook = selBook.data[0] ?? null;
     recommendedBooks = recBooks.data;
     suggestedBooks = suggBooks.data;
   } catch (error) {

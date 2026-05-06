@@ -1,8 +1,6 @@
 
-
 import styles from "@/app/(post-login)/player/[id]/page.module.css"
 import Skeleton from "../Skeleton";
-
 
 
 

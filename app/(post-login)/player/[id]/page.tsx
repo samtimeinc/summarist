@@ -11,9 +11,10 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
     try {
         const  { data } = await axios.get<Book>(
-        `https://us-central1-summaristt.cloudfunctions.net/getBook?id=${id}`);
+            `https://us-central1-summaristt.cloudfunctions.net/getBook?id=${id}`
+        );
 
-    book = data;
+        book = data;
      
     } catch (error) {
         console.error("Failed to fetch book: ", error);

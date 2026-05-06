@@ -1,4 +1,4 @@
-import React from 'react'
+
 import "../app/globals.css";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 

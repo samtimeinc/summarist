@@ -10,7 +10,14 @@ interface NumbersProp {
   subtitle: string;
 }
 
-const Numbers = ({ icon, icon2, numberOfIcons, iconClassName, title, subtitle }: NumbersProp) => {
+const Numbers = ({ 
+  icon, 
+  icon2, 
+  numberOfIcons, 
+  iconClassName, 
+  title, 
+  subtitle 
+}: NumbersProp) => {
   function displayNumberOfIcons(): React.ReactNode[] {
     return new Array(numberOfIcons).fill(0).map((_, index) => (
       <React.Fragment key={index} >

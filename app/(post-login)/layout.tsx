@@ -15,11 +15,8 @@ import { FontSizeProvider } from "@/context/FontSizeContext";
 const LayoutPostLogin = ({children}: {children: React.ReactNode}) => {
     const [showSideBar, setShowSideBar] = useState<boolean>(false);
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState<boolean>(false);
-
     const width = useWindowWidth();
     const {showModal} = useAuthModal();
-
-
 
     const toggleSideBar = () => {
         if (showSideBar) {

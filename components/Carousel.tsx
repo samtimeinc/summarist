@@ -22,14 +22,21 @@ const EmblaCarousel = ({ data }: CarouselProp) => {
     const goToPrev = () => emblaApi?.scrollPrev()
     const goToNext = () => emblaApi?.scrollNext()
 
-    if (!data?.length) return null; // prevent crash if empty
+    // prevent crash if empty
+    if (!data?.length) {
+        return null;
+    }
 
     return (
         <div className="embla">
             <div className="embla__viewport" ref={emblaRef}>
                 <div className="embla__container">
                     {data.map((book: Book) => (
-                        <Link href={`/book/${book.id}`} key={book.id} className="embla__slide" >
+                        <Link 
+                            href={`/book/${book.id}`} 
+                            key={book.id} 
+                            className="embla__slide" 
+                        >
                             <div className="carousel__book--wrapper">
                                 {book.subscriptionRequired && <div className='premium'>Premium</div>}
                                 <div className="carousel__book">

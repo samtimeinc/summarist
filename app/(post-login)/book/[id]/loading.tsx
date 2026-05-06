@@ -7,7 +7,6 @@ export default function Loading() {
       <div className={styles["container"]}>
         <div className={styles["inner__wrapper"]}>
           
-          {/* Left Half: Text and Buttons */}
           <div className={styles["inner__book--half"]}>
             <div className={styles["inner__title"]}>
               <Skeleton height="43px" width="70%" />
@@ -66,7 +65,6 @@ export default function Loading() {
             </div>
           </div>
 
-          {/* Right Half: The Cover Image */}
           <div className={styles["inner__img--half"]}>
             <Skeleton width="300px" height="300px" />
           </div>

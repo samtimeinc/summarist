@@ -24,17 +24,15 @@ import { AppDispatch, RootState } from '@/lib/redux/store';
 import { useRouter } from 'next/navigation';
 import { useAuthModal } from '@/context/AuthModalContext';
 import { addToast } from "@/lib/redux/toastSlice";
-import { AuthMode } from "@/context/AuthModalContext";
+import { validatePasswordStrength, validateEmail } from "@/lib/utilities/validation";
 
 
 import { FaUser } from "react-icons/fa";
 import { IoClose } from 'react-icons/io5';
 
-// export type AuthMode = "login" | "reset" | "create";
 type LoadingMode = "noLoad" | "guest" | "google" | "email" | "pwReset" | "newAccount";
 
 const Login = () => {
-    // const [authMode, setAuthMode] = useState<AuthMode>("login");
     const [loadingMode, setLoadingMode] = useState<LoadingMode>("noLoad");
     const [toggleDisabled, setToggleDisabled] = useState<boolean>(false);
 
@@ -74,7 +72,7 @@ const Login = () => {
                 message = "Invalid login credentials.";
                 break;
             case 'auth/weak-password':
-                message = "Password is too short. Please use at least 6 characters.";
+                message = "Password must be at least 8 characters and include uppercase, lowercase, a number, and a symbol.";
                 break;
             case 'auth/email-already-in-use':
                 message = "This email is already associated with an account.";
@@ -90,9 +88,8 @@ const Login = () => {
         }));
     }, [dispatch]);
 
-
-
-    // Handle anonymous-to-permanent account
+    // Divert guest users to register account
+    // Guests cannot access ability to login or reset pw
     useEffect(() => {
         if (user?.isAnonymous) {
             setAuthMode("create");
@@ -182,6 +179,28 @@ const Login = () => {
 
     const handleCreateOrLinkAccount = async (event: React.FormEvent) => {
         event.preventDefault();
+
+        // email check
+        if (!validateEmail(createEmail)) {
+            dispatch(addToast({
+                title: "Invalid Email",
+                message: "Please enter a valid email address",
+                type: "error",
+            }));
+            return;
+        }
+
+        // password check
+        const passwordCheck = validatePasswordStrength(createPassword);
+        if (!passwordCheck.isValid) {
+            dispatch(addToast({
+                title: "Weak Password",
+                message: passwordCheck.message,
+                type: "error"
+            }));
+            return;
+        }
+
         setLoadingMode("newAccount");
         setToggleDisabled(true);
 
@@ -209,6 +228,8 @@ const Login = () => {
             setToggleDisabled(false);
         }
     } 
+
+
 
     const handlePasswordReset = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -339,17 +360,17 @@ const Login = () => {
                 <div className={styles["modal__footer"]} >
                     {
                         toggleDisabled ? 
-                            (
-                                <Skeleton height="40px" width="398px" borderRadius="0px 0px 8px 8px" message='Logging in' />
-                            ) : (
-                                <button 
-                                    disabled={toggleDisabled}
-                                    className={styles["btn__modal--switch"]} 
-                                    onClick={() => setAuthMode("create")} 
-                                >
-                                    Sign up for a new account
-                                </button>
-                            )
+                        (
+                            <Skeleton height="40px" width="398px" borderRadius="0px 0px 8px 8px" message='Logging in' />
+                        ) : (
+                            <button 
+                                disabled={toggleDisabled}
+                                className={styles["btn__modal--switch"]} 
+                                onClick={() => setAuthMode("create")} 
+                            >
+                                Sign up for a new account
+                            </button>
+                        )
                     }
                 </div>
             </>
@@ -440,7 +461,9 @@ const Login = () => {
                                                     message='Please wait' 
                                                     fontSize={20} color='#fff' 
                                                 />
-                                            ) : ("Sign up with Google")}
+                                            ) : 
+                                            "Sign up with Google"
+                                        }
                                     </div>
                             </button>
 
@@ -479,14 +502,11 @@ const Login = () => {
                             >
                                 {
                                     loadingMode === "newAccount" ? 
-                                        (
-                                            <LoadingAnimation 
-                                                message='Please wait' 
-                                                fontSize={20} color='#032b41' 
-                                            />
-                                        ) : (
-                                            user?.isAnonymous ? "Sign up" : "Create account"
-                                        )
+                                        <LoadingAnimation 
+                                            message='Please wait' 
+                                            fontSize={20} color='#032b41' 
+                                        /> :
+                                        (user?.isAnonymous ? "Sign up" : "Create account")
                                 }
                             </button>
                     </form>
@@ -494,21 +514,19 @@ const Login = () => {
 
                 <div className={styles["modal__footer"]} >
                     {
-                        user?.isAnonymous ? "" : 
-                            (
-                                toggleDisabled ? 
-                                    (
-                                        <Skeleton height="40px" width="398px" borderRadius="0px 0px 8px 8px" />
-                                    ) : (
-                                        <button 
-                                            disabled={toggleDisabled}
-                                            className={styles["btn__modal--switch"]} 
-                                            onClick={() => setAuthMode("login")} 
-                                        >
-                                            Have an account? Go to login
-                                        </button>
-                                    )
-                            )
+                        user?.isAnonymous ? 
+                        "" : 
+                        (
+                            toggleDisabled ? 
+                                <Skeleton height="40px" width="398px" borderRadius="0px 0px 8px 8px" /> : 
+                                <button 
+                                    disabled={toggleDisabled}
+                                    className={styles["btn__modal--switch"]} 
+                                    onClick={() => setAuthMode("login")} 
+                                >
+                                    Have an account? Go to login
+                                </button>
+                        )
                     }
                 </div>
             </>
