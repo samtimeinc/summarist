@@ -205,15 +205,8 @@ The following routes require an authenticated session and will redirect to `/log
 
 ---
 
-## 📝 License
-
-This project is intended for educational purposes as part of the **Frontend Simplified** curriculum. All rights to the source belong to the author.
-
----
-
 ## 🙏 Acknowledgements
 
 - [Next.js](https://nextjs.org)
 - [Firebase](https://firebase.google.com)
 - [Stripe](https://stripe.com)
-- [Frontend Simplified](https://frontendsimplified.com)
